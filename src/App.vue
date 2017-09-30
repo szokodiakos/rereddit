@@ -1,17 +1,29 @@
 <template>
   <div id="app">
     <div class="card" v-for="post in posts" v-bind:key="post.id" style="max-width: 900px; margin: 25px auto;">
-      <header class="card-header">
-        <p class="card-header-title">
-          {{ post.subreddit }} &middot; {{ post.date }}
-        </p>
-        <p class="card-header-title" style="justify-content: flex-end; color: grey; font-weight: normal;">
-          {{ post.domain }}
+      <header class="card-header" v-bind:style="{ 'background-color': post.color }">
+        <p class="card-header-title" v-bind:style="{ 'color': post.textColor }">
+          {{ post.subreddit }} &middot; {{ post.date }} &middot; {{ post.domain }}
         </p>
       </header>
       <div class="card-content">
         <div class="content">
-          <p class="title">{{ post.title }}</p>
+          <div v-if="post.type !== postType.OTHER">
+            <p class="title">{{ post.title }}</p>
+          </div>
+          <div v-if="post.type === postType.OTHER">
+            <article class="media">
+              <figure class="media-left">
+                <p class="image is-128x128">
+                  <img :src="post.thumbnail">
+                </p>
+              </figure>
+              <div class="media-content">
+                <p class="title">{{ post.title }}</p>
+              </div>
+            </article>
+          </div>
+          <br>
           <div v-if="post.type === postType.VIDEO">
             <video style="display:block;margin:auto;"  preload="auto" autoplay="autoplay" muted="muted" loop="loop" webkit-playsinline="">
               <source :src="post.url" type="video/mp4"></source>
@@ -30,18 +42,18 @@
           <a href="#" class="card-footer-item">
             <b-icon pack="fa" icon="arrow-up"></b-icon>
           </a>
-          <label class="card-footer-item">
+          <label class="card-footer-item" style="text-transform: uppercase;">
             {{ post.score }}
           </label>
           <a href="#" class="card-footer-item">
             <b-icon pack="fa" icon="arrow-down"></b-icon>
           </a>
         </label>
-        <a href="#" class="card-footer-item">
+        <a href="#" class="card-footer-item" style="text-transform: uppercase;">
           <b-icon style="margin-right: 8px;" pack="fa" icon="comments-o"></b-icon>{{ post.commentCount }}
         </a>
         <a href="#" class="card-footer-item">
-          <b-icon style="margin-right: 8px;" pack="fa" icon="share"></b-icon>Share
+          <b-icon size="is-medium" style="margin-right: 8px;" pack="fa" icon="share"></b-icon>
         </a>
       </footer>
     </div>
@@ -60,21 +72,49 @@ import _ from 'lodash';
 import InfiniteLoading from 'vue-infinite-loading';
 import RotateLoader from 'vue-spinner/src/RotateLoader';
 
+function getRGBComponents(color) {
+  const r = color.substring(1, 3);
+  const g = color.substring(3, 5);
+  const b = color.substring(5, 7);
+
+  return {
+    R: parseInt(r, 16),
+    G: parseInt(g, 16),
+    B: parseInt(b, 16),
+  };
+}
+
+function getTextColor(bgColor) {
+  if (!bgColor) {
+    return '#000000';
+  }
+  const nThreshold = 105;
+  const components = getRGBComponents(bgColor);
+  const bgDelta = (components.R * 0.299) + (components.G * 0.587) + (components.B * 0.114);
+
+  return ((255 - bgDelta) < nThreshold) ? '#000000' : '#ffffff';
+}
+
 export default {
   name: 'app',
   async created() {
-    this.posts = await this.getPostsFromApi('https://www.reddit.com/.json?limit=10');
-    this.lastPostId = _.get(this.posts, `[${this.posts.length - 1}].id`);
-    this.posts = await this.populatePostDetails(this.posts);
+    const posts = await this.getPostsFromApi('https://www.reddit.com/.json?limit=10');
+    this.lastPostId = _.get(posts, `[${posts.length - 1}].id`);
+    this.posts = await this.populatePostDetails(posts);
   },
   methods: {
     populatePostDetails(posts) {
       return Promise.all(posts.map(async (post) => {
         const rawDetails = await post.detailsPromise;
+        const subredditInfoResponse = await this.$http.get(`https://www.reddit.com/${post.subreddit}/about.json`);
+        const color = _.get(subredditInfoResponse, 'body.data.key_color');
+        const textColor = getTextColor(color);
         const details = _.get(rawDetails, 'body.[0].data.children[0].data.selftext');
         return {
           ...post,
           details,
+          color,
+          textColor,
         };
       }));
     },
@@ -83,12 +123,14 @@ export default {
       return response.body.data.children.map(({ data: post }) => {
         const id = post.id;
         const title = post.title;
-        const score = numeral(post.score).format('0a');
-        const commentCount = numeral(post.num_comments).format('0a');
+        const format = n => (n > 1000 ? '0.0a' : '0a');
+        const score = numeral(post.score).format(format(post.score));
+        const commentCount = numeral(post.num_comments).format(format(post.num_comments));
         const subreddit = post.subreddit_name_prefixed;
         const author = post.author;
         const date = moment.utc(parseInt(`${post.created_utc}000`, 10)).fromNow();
         const domain = post.domain;
+        const thumbnail = post.thumbnail === 'default' ? 'static/reddit.jpeg' : post.thumbnail;
         let url = post.url;
         let detailsPromise = Promise.resolve();
 
@@ -96,24 +138,21 @@ export default {
         if (post.url.endsWith('.gifv')) {
           url = post.url.replace(/gifv$/, 'mp4');
           type = this.postType.VIDEO;
-        }
-        if (post.url.endsWith('.mp4')) {
+        } else if (post.url.endsWith('.mp4')) {
           type = this.postType.VIDEO;
-        }
-        if (post.url.endsWith('.png') || post.url.endsWith('.jpg')) {
+        } else if (post.url.endsWith('.png') || post.url.endsWith('.jpg')) {
           type = this.postType.IMAGE;
-        }
-        if (post.url.endsWith('.gif')) {
+        } else if (post.url.endsWith('.gif')) {
           type = this.postType.GIF;
-        }
-        if (post.domain.startsWith('self.')) {
+        } else if (post.domain.startsWith('self.')) {
           type = this.postType.TEXT;
           detailsPromise = this.$http.get(`${post.url.slice(0, -1)}.json`);
-        }
-        if (post.domain === 'imgur.com') {
+        } else if (post.domain === 'imgur.com') {
           type = this.postType.IMAGE;
           const imgurId = url.split('/').slice(-1)[0];
           url = `https://i.imgur.com/${imgurId}.jpg`;
+        } else {
+          type = this.postType.OTHER;
         }
 
         return {
@@ -128,15 +167,11 @@ export default {
           date,
           detailsPromise,
           type,
+          thumbnail,
         };
       });
     },
     async infiniteHandler($state) {
-      if (!this.lastPostId) {
-        $state.loaded();
-        return;
-      }
-
       const posts = await this.getPostsFromApi(`https://www.reddit.com/.json?limit=10&after=t3_${this.lastPostId}`);
       const populatedPosts = await this.populatePostDetails(posts);
       this.posts = [...this.posts, ...populatedPosts];
@@ -152,6 +187,7 @@ export default {
         VIDEO: 'video',
         IMAGE: 'image',
         GIF: 'gif',
+        OTHER: 'other',
       },
       lastPostId: '',
     };
