@@ -1,9 +1,12 @@
 <template>
   <div>
+    <div v-if="isInitialLoad" style="position: absolute;left: 50%;top: 50%;-webkit-transform: translate(-50%, -50%);transform: translate(-50%, -50%);">
+      <rotate-loader></rotate-loader>
+    </div>
     <div class="card" v-for="post in posts" v-bind:key="post.id" style="max-width: 900px; margin: 25px auto;">
       <header class="card-header" v-bind:style="{ 'background-color': post.color }">
         <p class="card-header-title" v-bind:style="{ 'color': post.textColor }">
-          {{ post.subreddit }} &middot; {{ post.date }} &middot; {{ post.domain }}
+          <router-link :to="`/${post.subreddit}`">{{ post.subreddit }}</router-link> &middot; {{ post.date }} &middot; {{ post.domain }}
         </p>
       </header>
       <div class="card-content">
@@ -78,7 +81,12 @@
         </a>
       </footer>
     </div>
-    <infinite-loading style="height: 100px; margin-top:50px" v-if="lastPostId" @infinite="infiniteHandler" v-bind:distance="2000">
+    <infinite-loading
+      style="height: 100px; margin-top:50px"
+      v-if="lastPostId"
+      @infinite="infiniteHandler"
+      v-bind:distance="2000"
+    >
       <span slot="spinner">
         <rotate-loader></rotate-loader>
       </span>
@@ -93,7 +101,6 @@ import _ from 'lodash';
 import InfiniteLoading from 'vue-infinite-loading';
 import RotateLoader from 'vue-spinner/src/RotateLoader';
 import VueMarkdown from 'vue-markdown';
-
 
 function getTwitchId(url) {
   const regExp = /^.*clips.twitch.tv\/(.*)\?/;
@@ -140,9 +147,17 @@ export default {
   name: 'app',
   async created() {
     this.subreddit = this.$route.params.subreddit ? `/r/${this.$route.params.subreddit}` : '';
-    const posts = await this.getPosts();
-    this.posts = await this.populatePostDetails(posts);
-    this.lastPostId = _.get(posts, `[${posts.length - 1}].id`);
+    this.posts = await this.getPosts();
+    this.isInitialLoad = false;
+  },
+  watch: {
+    async $route() {
+      this.posts = [];
+      this.isInitialLoad = true;
+      this.subreddit = this.$route.params.subreddit ? `/r/${this.$route.params.subreddit}` : '';
+      this.posts = await this.getPosts();
+      this.isInitialLoad = false;
+    },
   },
   methods: {
     async getColorBySubreddit(subreddit) {
@@ -177,7 +192,7 @@ export default {
         requestUrl += `&after=t3_${after}`;
       }
       const response = await this.$http.get(requestUrl);
-      return response.body.data.children.map(({ data: post }) => {
+      const posts = response.body.data.children.map(({ data: post }) => {
         const id = post.id;
         const title = post.title;
         const format = n => (n > 1000 ? '0.0a' : '0a');
@@ -237,21 +252,22 @@ export default {
           twitchId,
         };
       });
+      const populatedPosts = await this.populatePostDetails(posts);
+      this.lastPostId = _.get(posts, `[${posts.length - 1}].id`);
+      return populatedPosts;
     },
     async infiniteHandler($state) {
       if (!this.lastPostId) {
         $state.loaded();
         return;
       }
-      const posts = await this.getPosts({ after: this.lastPostId });
-      const populatedPosts = await this.populatePostDetails(posts);
-      this.posts = [...this.posts, ...populatedPosts];
-      this.lastPostId = _.get(this.posts, `[${this.posts.length - 1}].id`);
+      this.posts = [...this.posts, ...await this.getPosts({ after: this.lastPostId })];
       $state.loaded();
     },
   },
   data() {
     return {
+      isInitialLoad: true,
       subreddit: '',
       colors: {},
       posts: [],
@@ -274,3 +290,10 @@ export default {
   },
 };
 </script>
+
+<style>
+.card-header a {
+  text-decoration: none;
+  color: inherit;
+}
+</style>
