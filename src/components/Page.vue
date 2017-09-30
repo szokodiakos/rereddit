@@ -316,7 +316,7 @@ export default {
           type = this.postType.VIDEO;
         } else if (post.url.endsWith('.mp4')) {
           type = this.postType.VIDEO;
-        } else if (post.url.endsWith('.png') || post.url.endsWith('.jpg')) {
+        } else if (post.url.endsWith('.png') || post.url.endsWith('.jpg') || post.domain === 'i.imgur.com') {
           type = this.postType.IMAGE;
         } else if (post.url.endsWith('.gif')) {
           type = this.postType.GIF;
