@@ -13,8 +13,18 @@
         <div class="content">
           <div v-if="post.type !== postType.OTHER">
             <p class="title">
-              <b-icon v-if="post.isSticky" style="padding-left: 5px; color: #e74c3c;" size="is-medium" class="fa-rotate-270" pack="fa" icon="thumb-tack"></b-icon>
-              {{ post.title }}</p>
+              <a :href="post.url" target="_blank">
+                <b-icon
+                  v-if="post.isSticky"
+                  style="padding-left: 5px; color: #e74c3c;"
+                  size="is-medium"
+                  class="fa-rotate-270"
+                  pack="fa"
+                  icon="thumb-tack"
+                ></b-icon>
+                {{ post.title }}
+              </a>
+            </p>
           </div>
           <div v-if="post.type === postType.OTHER">
             <article class="media">
@@ -24,7 +34,9 @@
                 </p>
               </figure>
               <div class="media-content">
-                <p class="title">{{ post.title }}</p>
+                <a :href="post.url" target="_blank">
+                  <p class="title">{{ post.title }}</p>
+                </a>
               </div>
             </article>
           </div>
@@ -37,7 +49,7 @@
           <div v-if="post.type === postType.IMAGE || post.type === postType.GIF">
             <img style="display:block;margin:auto;" :src="post.url"></img>
           </div>
-          <div v-if="post.type === postType.TEXT">
+          <div v-if="post.type === postType.SELF">
             <p><vue-markdown>{{ post.details }}</vue-markdown></p>
           </div>
           <div v-if="post.type === postType.YOUTUBE">
@@ -61,6 +73,21 @@
               allowfullscreen="true"
             ></iframe>
           </div>
+          <div v-if="post.type === postType.GFYCAT">
+            <div style="position:relative;padding-bottom:57%">
+              <iframe
+                :src="`https://gfycat.com/ifr/${post.gfycatId}`"
+                frameborder="0"
+                scrolling="no"
+                width="100%"
+                height="100%"
+                style="position:absolute;top:0;left:0;"
+                allowfullscreen
+              ></iframe>
+            </div>
+          </div>
+          <!-- <div v-if="post.type === postType.VREDDIT">
+          </div> -->
         </div>
       </div>
       <footer class="card-footer">
@@ -104,8 +131,17 @@ import InfiniteLoading from 'vue-infinite-loading';
 import RotateLoader from 'vue-spinner/src/RotateLoader';
 import VueMarkdown from 'vue-markdown';
 
+function getGfycatId(url) {
+  const regExp = /^.*gfycat\.com\/(.*)/;
+  const match = url.match(regExp);
+  if (match && match[1]) {
+    return match[1];
+  }
+  return undefined;
+}
+
 function getTwitchId(url) {
-  const regExp = /^.*clips.twitch.tv\/(.*)\?/;
+  const regExp = /^.*clips\.twitch\.tv\/(.*)\?/;
   const match = url.match(regExp);
   if (match && match[1]) {
     return match[1];
@@ -210,6 +246,7 @@ export default {
         let detailsPromise = Promise.resolve();
         let youtubeId;
         let twitchId;
+        let gfycatId;
 
         let type;
         if (post.url.endsWith('.gifv')) {
@@ -222,7 +259,7 @@ export default {
         } else if (post.url.endsWith('.gif')) {
           type = this.postType.GIF;
         } else if (post.domain.startsWith('self.')) {
-          type = this.postType.TEXT;
+          type = this.postType.SELF;
           detailsPromise = this.$http.get(`${post.url.slice(0, -1)}.json`);
         } else if (post.domain === 'imgur.com') {
           type = this.postType.IMAGE;
@@ -234,6 +271,11 @@ export default {
         } else if (post.domain === 'clips.twitch.tv') {
           type = this.postType.TWITCH;
           twitchId = getTwitchId(post.url);
+        } else if (post.domain === 'gfycat.com') {
+          type = this.postType.GFYCAT;
+          gfycatId = getGfycatId(post.url);
+        // } else if (post.domain === 'v.redd.it') {
+        //   type = this.postType.VREDDIT;
         } else {
           type = this.postType.OTHER;
         }
@@ -254,6 +296,7 @@ export default {
           youtubeId,
           twitchId,
           isSticky,
+          gfycatId,
         };
       });
       const populatedPosts = await this.populatePostDetails(posts);
@@ -276,13 +319,15 @@ export default {
       colors: {},
       posts: [],
       postType: {
-        TEXT: 'text',
+        SELF: 'self',
         VIDEO: 'video',
         IMAGE: 'image',
         GIF: 'gif',
         YOUTUBE: 'youtube',
         TWITCH: 'twitch',
         OTHER: 'other',
+        GFYCAT: 'gfycat',
+        VREDDIT: 'vreddit',
       },
       lastPostId: '',
     };
@@ -297,7 +342,10 @@ export default {
 
 <style>
 .card-header a {
-  text-decoration: none;
+  color: inherit;
+}
+
+.title a {
   color: inherit;
 }
 </style>
