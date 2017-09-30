@@ -84,7 +84,7 @@
               style="display:block;margin:auto;"
               width="840"
               height="472"
-              :src="`https://www.youtube.com/embed/${post.youtubeId}?rel=0&amp;showinfo=0`"
+              :src="`https://www.youtube.com/embed/${post.mediaId}?rel=0&amp;showinfo=0`"
               frameborder="0"
               allowfullscreen
             ></iframe>
@@ -92,7 +92,7 @@
           <div v-if="post.type === postType.TWITCH">
             <iframe
               style="display:block;margin:auto;"
-              :src="`https://clips.twitch.tv/embed?clip=${post.twitchId}&autoplay=false&tt_medium=clips_embed`"
+              :src="`https://clips.twitch.tv/embed?clip=${post.mediaId}&autoplay=false&tt_medium=clips_embed`"
               width="840"
               height="472"
               frameborder="0"
@@ -103,7 +103,7 @@
           <div v-if="post.type === postType.GFYCAT">
             <div style="position:relative;padding-bottom:57%">
               <iframe
-                :src="`https://gfycat.com/ifr/${post.gfycatId}`"
+                :src="`https://gfycat.com/ifr/${post.mediaId}`"
                 frameborder="0"
                 scrolling="no"
                 width="100%"
@@ -115,7 +115,7 @@
           </div>
           <div v-if="post.type === postType.STREAMABLE">
               <iframe
-                :src="`https://streamable.com/s/${post.streamableId}`"
+                :src="`https://streamable.com/s/${post.mediaId}`"
                 frameborder="0"
                 width="840"
                 height="472"
@@ -305,10 +305,7 @@ export default {
         const isSticky = post.stickied;
         let url = post.url;
         let detailsPromise = Promise.resolve();
-        let youtubeId;
-        let twitchId;
-        let gfycatId;
-        let streamableId;
+        let mediaId;
 
         let type;
         if (post.url.endsWith('.gifv')) {
@@ -329,18 +326,18 @@ export default {
           url = `https://i.imgur.com/${imgurId}.jpg`;
         } else if (post.domain.endsWith('youtube.com') || post.domain === 'youtu.be') {
           type = this.postType.YOUTUBE;
-          youtubeId = getYoutubeId(post.url);
+          mediaId = getYoutubeId(post.url);
         } else if (post.domain === 'clips.twitch.tv') {
           type = this.postType.TWITCH;
-          twitchId = getTwitchId(post.url);
+          mediaId = getTwitchId(post.url);
         } else if (post.domain === 'gfycat.com') {
           type = this.postType.GFYCAT;
-          gfycatId = getGfycatId(post.url);
+          mediaId = getGfycatId(post.url);
         // } else if (post.domain === 'v.redd.it') {
         //   type = this.postType.VREDDIT;
         } else if (post.domain === 'streamable.com') {
           type = this.postType.STREAMABLE;
-          streamableId = getStreamableId(post.url);
+          mediaId = getStreamableId(post.url);
         } else {
           type = this.postType.OTHER;
         }
@@ -358,11 +355,8 @@ export default {
           detailsPromise,
           type,
           thumbnail,
-          youtubeId,
-          twitchId,
+          mediaId,
           isSticky,
-          gfycatId,
-          streamableId,
         };
       });
       const populatedPosts = await this.populatePostDetails(posts);
