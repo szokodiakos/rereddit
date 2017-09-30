@@ -113,6 +113,15 @@
               ></iframe>
             </div>
           </div>
+          <div v-if="post.type === postType.STREAMABLE">
+              <iframe
+                :src="`https://streamable.com/s/${post.streamableId}`"
+                frameborder="0"
+                width="840"
+                height="472"
+                allowfullscreen
+              ></iframe>
+          </div>
           <!-- <div v-if="post.type === postType.VREDDIT">
           </div> -->
         </div>
@@ -157,6 +166,15 @@ import _ from 'lodash';
 import InfiniteLoading from 'vue-infinite-loading';
 import RotateLoader from 'vue-spinner/src/RotateLoader';
 import VueMarkdown from 'vue-markdown';
+
+function getStreamableId(url) {
+  const regExp = /^.*streamable\.com\/(.*)/;
+  const match = url.match(regExp);
+  if (match && match[1]) {
+    return match[1];
+  }
+  return undefined;
+}
 
 function getGfycatId(url) {
   const regExp = /^.*gfycat\.com\/(.*)/;
@@ -290,6 +308,7 @@ export default {
         let youtubeId;
         let twitchId;
         let gfycatId;
+        let streamableId;
 
         let type;
         if (post.url.endsWith('.gifv')) {
@@ -319,6 +338,9 @@ export default {
           gfycatId = getGfycatId(post.url);
         // } else if (post.domain === 'v.redd.it') {
         //   type = this.postType.VREDDIT;
+        } else if (post.domain === 'streamable.com') {
+          type = this.postType.STREAMABLE;
+          streamableId = getStreamableId(post.url);
         } else {
           type = this.postType.OTHER;
         }
@@ -340,6 +362,7 @@ export default {
           twitchId,
           isSticky,
           gfycatId,
+          streamableId,
         };
       });
       const populatedPosts = await this.populatePostDetails(posts);
@@ -373,6 +396,7 @@ export default {
         OTHER: 'other',
         GFYCAT: 'gfycat',
         VREDDIT: 'vreddit',
+        STREAMABLE: 'streamable',
       },
       lastPostId: '',
     };
