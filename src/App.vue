@@ -103,13 +103,19 @@ export default {
     this.posts = await this.populatePostDetails(posts);
   },
   methods: {
+    async getColorBySubreddit(subreddit) {
+      if (!this.colors[subreddit]) {
+        const response = await this.$http.get(`https://www.reddit.com/${subreddit}/about.json`);
+        this.colors[subreddit] = _.get(response, 'body.data.key_color');
+      }
+      return this.colors[subreddit];
+    },
     populatePostDetails(posts) {
       return Promise.all(posts.map(async (post) => {
         const rawDetails = await post.detailsPromise;
-        const subredditInfoResponse = await this.$http.get(`https://www.reddit.com/${post.subreddit}/about.json`);
-        const color = _.get(subredditInfoResponse, 'body.data.key_color');
-        const textColor = getTextColor(color);
         const details = _.get(rawDetails, 'body.[0].data.children[0].data.selftext');
+        const color = await this.getColorBySubreddit(post.subreddit);
+        const textColor = getTextColor(color);
         return {
           ...post,
           details,
@@ -181,6 +187,7 @@ export default {
   },
   data() {
     return {
+      colors: {},
       posts: [],
       postType: {
         TEXT: 'text',
