@@ -12,7 +12,9 @@
       <div class="card-content">
         <div class="content">
           <div v-if="post.type !== postType.OTHER">
-            <p class="title">{{ post.title }}</p>
+            <p class="title">
+              <b-icon v-if="post.isSticky" style="padding-left: 5px; color: #e74c3c;" size="is-medium" class="fa-rotate-270" pack="fa" icon="thumb-tack"></b-icon>
+              {{ post.title }}</p>
           </div>
           <div v-if="post.type === postType.OTHER">
             <article class="media">
@@ -83,7 +85,7 @@
     </div>
     <infinite-loading
       style="height: 100px; margin-top:50px"
-      v-if="lastPostId"
+      v-if="lastPostId && !isInitialLoad"
       @infinite="infiniteHandler"
       v-bind:distance="2000"
     >
@@ -203,6 +205,7 @@ export default {
         const date = moment.utc(parseInt(`${post.created_utc}000`, 10)).fromNow();
         const domain = post.domain;
         const thumbnail = post.thumbnail === 'default' ? 'static/reddit.jpeg' : post.thumbnail;
+        const isSticky = post.stickied;
         let url = post.url;
         let detailsPromise = Promise.resolve();
         let youtubeId;
@@ -250,6 +253,7 @@ export default {
           thumbnail,
           youtubeId,
           twitchId,
+          isSticky,
         };
       });
       const populatedPosts = await this.populatePostDetails(posts);
