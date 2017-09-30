@@ -4,6 +4,7 @@ import Buefy from 'buefy';
 import moment from 'moment';
 import 'buefy/lib/buefy.min.css';
 import 'font-awesome/css/font-awesome.min.css';
+import router from './router';
 import App from './App';
 
 moment.updateLocale('en', {
@@ -31,5 +32,8 @@ Vue.use(VueResource);
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
-  render: h => h(App),
+  router,
+  template: '<App/>',
+  components: { App },
 });
+
