@@ -35,6 +35,27 @@
           <div v-if="post.type === postType.TEXT">
             <p><vue-markdown>{{ post.details }}</vue-markdown></p>
           </div>
+          <div v-if="post.type === postType.YOUTUBE">
+            <iframe
+              style="display:block;margin:auto;"
+              width="840"
+              height="472"
+              :src="`https://www.youtube.com/embed/${post.youtubeId}?rel=0&amp;showinfo=0`"
+              frameborder="0"
+              allowfullscreen
+            ></iframe>
+          </div>
+          <div v-if="post.type === postType.TWITCH">
+            <iframe
+              style="display:block;margin:auto;"
+              :src="`https://clips.twitch.tv/embed?clip=${post.twitchId}&autoplay=false&tt_medium=clips_embed`"
+              width="840"
+              height="472"
+              frameborder="0"
+              scrolling="no"
+              allowfullscreen="true"
+            ></iframe>
+          </div>
         </div>
       </div>
       <footer class="card-footer">
@@ -73,6 +94,25 @@ import InfiniteLoading from 'vue-infinite-loading';
 import RotateLoader from 'vue-spinner/src/RotateLoader';
 import VueMarkdown from 'vue-markdown';
 
+
+function getTwitchId(url) {
+  const regExp = /^.*clips.twitch.tv\/(.*)\?/;
+  const match = url.match(regExp);
+  if (match && match[1]) {
+    return match[1];
+  }
+  return undefined;
+}
+
+function getYoutubeId(url) {
+  const regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+  const match = url.match(regExp);
+  if (match && match[2].length === 11) {
+    return match[2];
+  }
+  return undefined;
+}
+
 function getRGBComponents(color) {
   const r = color.substring(1, 3);
   const g = color.substring(3, 5);
@@ -101,8 +141,8 @@ export default {
   async created() {
     this.subreddit = this.$route.params.subreddit ? `/r/${this.$route.params.subreddit}` : '';
     const posts = await this.getPosts();
-    this.lastPostId = _.get(posts, `[${posts.length - 1}].id`);
     this.posts = await this.populatePostDetails(posts);
+    this.lastPostId = _.get(posts, `[${posts.length - 1}].id`);
   },
   methods: {
     async getColorBySubreddit(subreddit) {
@@ -112,7 +152,12 @@ export default {
       }
       return this.colors[subreddit];
     },
-    populatePostDetails(posts) {
+    async populatePostDetails(posts) {
+      const subreddits = _.uniq(posts.map(post => post.subreddit));
+
+      // prefetch subreddits
+      await Promise.all(subreddits.map(subreddit => this.getColorBySubreddit(subreddit)));
+
       return Promise.all(posts.map(async (post) => {
         const rawDetails = await post.detailsPromise;
         const details = _.get(rawDetails, 'body.[0].data.children[0].data.selftext');
@@ -145,6 +190,8 @@ export default {
         const thumbnail = post.thumbnail === 'default' ? 'static/reddit.jpeg' : post.thumbnail;
         let url = post.url;
         let detailsPromise = Promise.resolve();
+        let youtubeId;
+        let twitchId;
 
         let type;
         if (post.url.endsWith('.gifv')) {
@@ -163,6 +210,12 @@ export default {
           type = this.postType.IMAGE;
           const imgurId = url.split('/').slice(-1)[0];
           url = `https://i.imgur.com/${imgurId}.jpg`;
+        } else if (post.domain === 'youtube.com' || post.domain === 'youtu.be') {
+          type = this.postType.YOUTUBE;
+          youtubeId = getYoutubeId(post.url);
+        } else if (post.domain === 'clips.twitch.tv') {
+          type = this.postType.TWITCH;
+          twitchId = getTwitchId(post.url);
         } else {
           type = this.postType.OTHER;
         }
@@ -180,10 +233,16 @@ export default {
           detailsPromise,
           type,
           thumbnail,
+          youtubeId,
+          twitchId,
         };
       });
     },
     async infiniteHandler($state) {
+      if (!this.lastPostId) {
+        $state.loaded();
+        return;
+      }
       const posts = await this.getPosts({ after: this.lastPostId });
       const populatedPosts = await this.populatePostDetails(posts);
       this.posts = [...this.posts, ...populatedPosts];
@@ -201,6 +260,8 @@ export default {
         VIDEO: 'video',
         IMAGE: 'image',
         GIF: 'gif',
+        YOUTUBE: 'youtube',
+        TWITCH: 'twitch',
         OTHER: 'other',
       },
       lastPostId: '',
