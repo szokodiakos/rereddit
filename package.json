@@ -2,6 +2,7 @@
   "name": "rereddit",
   "version": "1.0.0",
   "description": "alternative reddit client",
+  "homepage": "https://szokodiakos.github.io/rereddit/",
   "author": "",
   "private": true,
   "scripts": {
