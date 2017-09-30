@@ -3,10 +3,35 @@
     <div v-if="isInitialLoad" style="position: absolute;left: 50%;top: 50%;-webkit-transform: translate(-50%, -50%);transform: translate(-50%, -50%);">
       <rotate-loader></rotate-loader>
     </div>
+    <section v-if="!isInitialLoad" class="hero is-primary is-bold">
+      <div v-if="!subreddit" class="hero-body" v-bind:style="{ 'background-color': defaultColor }">
+        <div class="container">
+          <h1 class="title">
+            Rereddit
+          </h1>
+          <h2 class="subtitle">
+            An alternative <i class="fa fa-reddit-alien" aria-hidden="true"></i> client
+          </h2>
+        </div>
+      </div>
+      <div v-if="subreddit" class="hero-body" v-bind:style="{
+        'background-image': `-webkit-linear-gradient(left, ${subredditData.color}, rgba(0,0,0,0))${subredditData.bannerImg ? `, url(${subredditData.bannerImg})` : ''}`,
+        'background-size': `auto, cover`,
+      }">
+        <div class="container">
+          <h1 class="title" v-bind:style="{ color: subredditData.textColor }">
+            {{ subreddit }}
+          </h1>
+          <h2 v-if="subredditData.title" class="subtitle" v-bind:style="{ color: subredditData.textColor }">
+            {{ subredditData.title }}
+          </h2>
+        </div>
+      </div>
+    </section>
     <div class="card" v-for="post in posts" v-bind:key="post.id" style="max-width: 900px; margin: 25px auto;">
       <header class="card-header" v-bind:style="{ 'background-color': post.color }">
         <p class="card-header-title" v-bind:style="{ 'color': post.textColor }">
-          <router-link :to="`/${post.subreddit}`">{{ post.subreddit }}</router-link> &middot; {{ post.date }} &middot; {{ post.domain }}
+          <router-link :to="`/${post.subreddit}`">{{ post.subreddit }}</router-link>&nbsp;&middot; {{ post.date }} &middot; {{ post.domain }}
         </p>
       </header>
       <div class="card-content">
@@ -30,7 +55,9 @@
             <article class="media">
               <figure class="media-left">
                 <p class="image is-128x128">
-                  <img :src="post.thumbnail">
+                  <a :href="post.url" target="_blank">
+                    <img :src="post.thumbnail">
+                  </a>
                 </p>
               </figure>
               <div class="media-content">
@@ -201,7 +228,8 @@ export default {
     async getColorBySubreddit(subreddit) {
       if (!this.colors[subreddit]) {
         const response = await this.$http.get(`https://www.reddit.com/${subreddit}/about.json`);
-        this.colors[subreddit] = _.get(response, 'body.data.key_color');
+        const color = _.get(response, 'body.data.key_color') || this.defaultColor;
+        this.colors[subreddit] = color;
       }
       return this.colors[subreddit];
     },
@@ -225,6 +253,21 @@ export default {
       }));
     },
     async getPosts({ after } = {}) {
+      if (this.subreddit) {
+        const subredditResponse = await this.$http.get(`https://www.reddit.com/${this.subreddit}/about.json`);
+        const subredditData = subredditResponse.body.data;
+        this.subredditData = {
+          title: subredditData.title,
+          onlineUsers: subredditData.accounts_active,
+          totalUsers: subredditData.accounts_active,
+          headerImg: subredditData.header_img,
+          bannerImg: subredditData.banner_img,
+          iconImg: subredditData.icon_img,
+          color: subredditData.key_color || this.defaultColor,
+        };
+        this.subredditData.textColor = getTextColor(this.subredditData.color);
+      }
+
       let requestUrl = `https://www.reddit.com/${this.subreddit}.json?limit=10`;
       if (after) {
         requestUrl += `&after=t3_${after}`;
@@ -314,10 +357,12 @@ export default {
   },
   data() {
     return {
+      defaultColor: '#c0392b',
       isInitialLoad: true,
       subreddit: '',
       colors: {},
       posts: [],
+      subredditData: {},
       postType: {
         SELF: 'self',
         VIDEO: 'video',
