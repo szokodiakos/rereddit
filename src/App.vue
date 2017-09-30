@@ -45,6 +45,11 @@
         </a>
       </footer>
     </div>
+    <infinite-loading style="height: 100px; margin-top:50px" v-if="lastPostId" @infinite="infiniteHandler" v-bind:distance="2000">
+      <span slot="spinner">
+        <rotate-loader></rotate-loader>
+      </span>
+    </infinite-loading>
   </div>
 </template>
 
@@ -52,51 +57,92 @@
 import moment from 'moment';
 import numeral from 'numeral';
 import _ from 'lodash';
+import InfiniteLoading from 'vue-infinite-loading';
+import RotateLoader from 'vue-spinner/src/RotateLoader';
 
 export default {
   name: 'app',
-  created: async function created() {
-    const response = await this.$http.get('https://www.reddit.com/r/all/hot.json');
-    this.posts = response.body.data.children.map(({ data: post }) => {
-      let type;
-      if (post.url.endsWith('.gifv') || post.url.endsWith('.mp4')) {
-        type = this.postType.VIDEO;
-      }
-      if (post.url.endsWith('.png') || post.url.endsWith('.jpg')) {
-        type = this.postType.IMAGE;
-      }
-      if (post.url.endsWith('.gif')) {
-        type = this.postType.GIF;
-      }
-      if (post.domain.startsWith('self.')) {
-        type = this.postType.TEXT;
+  async created() {
+    this.posts = await this.getPostsFromApi('https://www.reddit.com/.json?limit=10');
+    this.lastPostId = _.get(this.posts, `[${this.posts.length - 1}].id`);
+    this.posts = await this.populatePostDetails(this.posts);
+  },
+  methods: {
+    populatePostDetails(posts) {
+      return Promise.all(posts.map(async (post) => {
+        const rawDetails = await post.detailsPromise;
+        const details = _.get(rawDetails, 'body.[0].data.children[0].data.selftext');
+        return {
+          ...post,
+          details,
+        };
+      }));
+    },
+    async getPostsFromApi(api) {
+      const response = await this.$http.get(api);
+      return response.body.data.children.map(({ data: post }) => {
+        const id = post.id;
+        const title = post.title;
+        const score = numeral(post.score).format('0a');
+        const commentCount = numeral(post.num_comments).format('0a');
+        const subreddit = post.subreddit_name_prefixed;
+        const author = post.author;
+        const date = moment.utc(parseInt(`${post.created_utc}000`, 10)).fromNow();
+        const domain = post.domain;
+        let url = post.url;
+        let detailsPromise = Promise.resolve();
+
+        let type;
+        if (post.url.endsWith('.gifv')) {
+          url = post.url.replace(/gifv$/, 'mp4');
+          type = this.postType.VIDEO;
+        }
+        if (post.url.endsWith('.mp4')) {
+          type = this.postType.VIDEO;
+        }
+        if (post.url.endsWith('.png') || post.url.endsWith('.jpg')) {
+          type = this.postType.IMAGE;
+        }
+        if (post.url.endsWith('.gif')) {
+          type = this.postType.GIF;
+        }
+        if (post.domain.startsWith('self.')) {
+          type = this.postType.TEXT;
+          detailsPromise = this.$http.get(`${post.url.slice(0, -1)}.json`);
+        }
+        if (post.domain === 'imgur.com') {
+          type = this.postType.IMAGE;
+          const imgurId = url.split('/').slice(-1)[0];
+          url = `https://i.imgur.com/${imgurId}.jpg`;
+        }
+
+        return {
+          id,
+          title,
+          score,
+          commentCount,
+          url,
+          subreddit,
+          author,
+          domain,
+          date,
+          detailsPromise,
+          type,
+        };
+      });
+    },
+    async infiniteHandler($state) {
+      if (!this.lastPostId) {
+        $state.loaded();
+        return;
       }
 
-      return {
-        id: post.id,
-        title: post.title,
-        score: numeral(post.score).format('0a'),
-        commentCount: numeral(post.num_comments).format('0a'),
-        url: post.url.endsWith('.gifv') ? post.url.replace(/gifv$/, 'mp4') : post.url,
-        subreddit: post.subreddit_name_prefixed,
-        author: post.author,
-        domain: post.domain,
-        date: moment.utc(parseInt(`${post.created_utc}000`, 10)).fromNow(),
-        detailsPromise: type === this.postType.TEXT ?
-          this.$http.get(`${post.url.slice(0, -1)}.json`) :
-          Promise.resolve(),
-        type,
-      };
-    });
-
-    this.posts = await Promise.all(this.posts.map(async (post) => {
-      const rawDetails = await post.detailsPromise;
-      const details = _.get(rawDetails, 'body.[0].data.children[0].data.selftext');
-      return {
-        ...post,
-        details,
-      };
-    }));
+      const posts = await this.getPostsFromApi(`https://www.reddit.com/.json?limit=10&after=t3_${this.lastPostId}`);
+      const populatedPosts = await this.populatePostDetails(posts);
+      this.posts = [...this.posts, ...populatedPosts];
+      this.lastPostId = _.get(this.posts, `[${this.posts.length - 1}].id`);
+      $state.loaded();
+    },
   },
   data() {
     return {
@@ -107,7 +153,12 @@ export default {
         IMAGE: 'image',
         GIF: 'gif',
       },
+      lastPostId: '',
     };
+  },
+  components: {
+    InfiniteLoading,
+    RotateLoader,
   },
 };
 </script>
