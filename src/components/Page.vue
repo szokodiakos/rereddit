@@ -283,7 +283,7 @@ export default {
         const author = post.author;
         const date = moment.utc(parseInt(`${post.created_utc}000`, 10)).fromNow();
         const domain = post.domain;
-        const thumbnail = post.thumbnail === 'default' ? 'static/reddit.jpeg' : post.thumbnail;
+        const thumbnail = (!post.thumbnail || post.thumbnail === 'default') ? 'static/reddit.jpeg' : post.thumbnail;
         const isSticky = post.stickied;
         let url = post.url;
         let detailsPromise = Promise.resolve();
@@ -308,7 +308,7 @@ export default {
           type = this.postType.IMAGE;
           const imgurId = url.split('/').slice(-1)[0];
           url = `https://i.imgur.com/${imgurId}.jpg`;
-        } else if (post.domain === 'youtube.com' || post.domain === 'youtu.be') {
+        } else if (post.domain.endsWith('youtube.com') || post.domain === 'youtu.be') {
           type = this.postType.YOUTUBE;
           youtubeId = getYoutubeId(post.url);
         } else if (post.domain === 'clips.twitch.tv') {
