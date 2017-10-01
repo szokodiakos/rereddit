@@ -74,7 +74,7 @@
             </video>
           </div>
           <div v-if="post.type === postType.IMAGE || post.type === postType.GIF">
-            <img style="display:block;margin:auto;" :src="post.url"></img>
+            <a target="_blank" :href="post.url"><img style="display:block;margin:auto;" :src="post.url"></img></a>
           </div>
           <div v-if="post.type === postType.SELF">
             <p><vue-markdown>{{ post.details }}</vue-markdown></p>
@@ -127,23 +127,23 @@
         </div>
       </div>
       <footer class="card-footer">
-        <label class="card-footer-item">
-          <a href="#" class="card-footer-item">
+        <label class="card-footer-item" style="text-transform: uppercase;">
+          <!-- <a href="#" class="card-footer-item">
             <b-icon pack="fa" icon="arrow-up"></b-icon>
           </a>
-          <label class="card-footer-item" style="text-transform: uppercase;">
-            {{ post.score }}
-          </label>
+          <label class="card-footer-item" style="text-transform: uppercase;"> -->
+            <b-icon style="margin-right: 8px;" pack="fa" icon="star-half-o"></b-icon> {{ post.score }}
+          <!-- </label>
           <a href="#" class="card-footer-item">
             <b-icon pack="fa" icon="arrow-down"></b-icon>
-          </a>
+          </a> -->
         </label>
         <a href="#" class="card-footer-item" style="text-transform: uppercase;">
           <b-icon style="margin-right: 8px;" pack="fa" icon="comments-o"></b-icon>{{ post.commentCount }}
         </a>
-        <a href="#" class="card-footer-item">
+        <!-- <a href="#" class="card-footer-item">
           <b-icon size="is-medium" style="margin-right: 8px;" pack="fa" icon="share"></b-icon>
-        </a>
+        </a> -->
       </footer>
     </div>
     <infinite-loading
