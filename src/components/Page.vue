@@ -3,7 +3,7 @@
     <div v-if="isInitialLoad" style="position: absolute;left: 50%;top: 50%;-webkit-transform: translate(-50%, -50%);transform: translate(-50%, -50%);">
       <rotate-loader></rotate-loader>
     </div>
-    <section v-if="!isInitialLoad" class="hero is-primary is-bold">
+    <section v-if="!isInitialLoad" class="hero is-primary is-bold jump-target">
       <div v-if="!subreddit" class="hero-body" v-bind:style="{ 'background-color': defaultColor }">
         <div class="container">
           <h1 class="title">
@@ -28,10 +28,21 @@
         </div>
       </div>
     </section>
+    <a class="button is-large" @click="jumpToTop" v-bind:style="{
+      'z-index': 10,
+      position: 'fixed',
+      bottom: '10px',
+      right: '10px',
+      'background-color': subredditData.color || this.defaultColor
+    }">
+      <span class="icon is-large">
+        <i class="fa fa-chevron-up" v-bind:style="{ color: subredditData.textColor || 'white' }"></i>
+      </span>
+    </a>
     <div class="card" v-for="post in posts" v-bind:key="post.id" style="max-width: 900px; margin: 25px auto;">
       <header class="card-header" v-bind:style="{ 'background-color': post.color }">
         <p class="card-header-title" v-bind:style="{ 'color': post.textColor }">
-          <router-link :to="`/${post.subreddit}`">{{ post.subreddit }}</router-link>&nbsp;&middot; {{ post.date }} &middot; {{ post.domain }}
+          <router-link :to="`/${post.subreddit}`">{{ post.subreddit }}</router-link>&nbsp;&middot; {{ post.date }} &middot; <a :href="post.url" target="_blank">{{ post.domain }}</a>
         </p>
       </header>
       <div class="card-content">
@@ -166,6 +177,7 @@ import _ from 'lodash';
 import InfiniteLoading from 'vue-infinite-loading';
 import RotateLoader from 'vue-spinner/src/RotateLoader';
 import VueMarkdown from 'vue-markdown';
+import jump from 'jump.js';
 
 function getStreamableId(url) {
   const regExp = /^.*streamable\.com\/(.*)/;
@@ -243,6 +255,9 @@ export default {
     },
   },
   methods: {
+    jumpToTop() {
+      jump('.jump-target');
+    },
     async getColorBySubreddit(subreddit) {
       if (!this.colors[subreddit]) {
         const response = await this.$http.get(`https://www.reddit.com/${subreddit}/about.json`);
