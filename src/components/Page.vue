@@ -38,124 +38,24 @@
           <i class="fa fa-chevron-up" v-bind:style="{ color: subredditData.textColor }"></i>
         </span>
       </a>
-      <div class="card" v-for="post in posts" v-bind:key="post.id" style="max-width: 900px; margin: 25px auto;">
-        <header class="card-header" v-bind:style="{ 'background-color': post.color }">
-          <p class="card-header-title" v-bind:style="{ 'color': post.textColor }">
-            <router-link :to="`/${post.subreddit}`">{{ post.subreddit }}</router-link>&nbsp;&middot; {{ post.date }} &middot; <a :href="post.url" target="_blank">{{ post.domain }}</a>
-          </p>
-        </header>
-        <div class="card-content">
-          <div class="content">
-            <div v-if="post.type !== postType.OTHER">
-              <p class="title">
-                <a :href="post.url" target="_blank">
-                  <b-icon
-                    v-if="post.isSticky"
-                    style="padding-left: 5px; color: #e74c3c;"
-                    size="is-medium"
-                    class="fa-rotate-270"
-                    pack="fa"
-                    icon="thumb-tack"
-                  ></b-icon>
-                  {{ post.title }}
-                </a>
-              </p>
-            </div>
-            <div v-if="post.type === postType.OTHER">
-              <article class="media">
-                <figure class="media-left">
-                  <p class="image is-128x128">
-                    <a :href="post.url" target="_blank">
-                      <img :src="post.thumbnail">
-                    </a>
-                  </p>
-                </figure>
-                <div class="media-content">
-                  <a :href="post.url" target="_blank">
-                    <p class="title">{{ post.title }}</p>
-                  </a>
-                </div>
-              </article>
-            </div>
-            <br>
-            <div v-if="post.type === postType.VIDEO">
-              <video style="display:block;margin:auto;"  preload="auto" autoplay="autoplay" muted="muted" loop="loop" webkit-playsinline="">
-                <source :src="post.url" type="video/mp4"></source>
-              </video>
-            </div>
-            <div v-if="post.type === postType.IMAGE || post.type === postType.GIF">
-              <a target="_blank" :href="post.url"><img style="display:block;margin:auto;" :src="post.url"></img></a>
-            </div>
-            <div v-if="post.type === postType.SELF">
-              <p><vue-markdown>{{ post.details }}</vue-markdown></p>
-            </div>
-            <div v-if="post.type === postType.YOUTUBE">
-              <iframe
-                style="display:block;margin:auto;"
-                width="840"
-                height="472"
-                :src="`https://www.youtube.com/embed/${post.mediaId}?rel=0&amp;showinfo=0`"
-                frameborder="0"
-                allowfullscreen
-              ></iframe>
-            </div>
-            <div v-if="post.type === postType.TWITCH">
-              <iframe
-                style="display:block;margin:auto;"
-                :src="`https://clips.twitch.tv/embed?clip=${post.mediaId}&autoplay=false&tt_medium=clips_embed`"
-                width="840"
-                height="472"
-                frameborder="0"
-                scrolling="no"
-                allowfullscreen="true"
-              ></iframe>
-            </div>
-            <div v-if="post.type === postType.GFYCAT">
-              <div style="position:relative;padding-bottom:57%">
-                <iframe
-                  :src="`https://gfycat.com/ifr/${post.mediaId}`"
-                  frameborder="0"
-                  scrolling="no"
-                  width="100%"
-                  height="100%"
-                  style="position:absolute;top:0;left:0;"
-                  allowfullscreen
-                ></iframe>
-              </div>
-            </div>
-            <div v-if="post.type === postType.STREAMABLE">
-                <iframe
-                  :src="`https://streamable.com/s/${post.mediaId}`"
-                  frameborder="0"
-                  width="840"
-                  height="472"
-                  allowfullscreen
-                ></iframe>
-            </div>
-            <!-- <div v-if="post.type === postType.VREDDIT">
-            </div> -->
-          </div>
-        </div>
-        <footer class="card-footer">
-          <label class="card-footer-item" style="text-transform: uppercase;">
-            <!-- <a href="#" class="card-footer-item">
-              <b-icon pack="fa" icon="arrow-up"></b-icon>
-            </a>
-            <label class="card-footer-item" style="text-transform: uppercase;"> -->
-              <b-icon style="margin-right: 8px;" pack="fa" icon="star-half-o"></b-icon> {{ post.score }}
-            <!-- </label>
-            <a href="#" class="card-footer-item">
-              <b-icon pack="fa" icon="arrow-down"></b-icon>
-            </a> -->
-          </label>
-          <a href="#" class="card-footer-item" style="text-transform: uppercase;">
-            <b-icon style="margin-right: 8px;" pack="fa" icon="comments-o"></b-icon>{{ post.commentCount }}
-          </a>
-          <!-- <a href="#" class="card-footer-item">
-            <b-icon size="is-medium" style="margin-right: 8px;" pack="fa" icon="share"></b-icon>
-          </a> -->
-        </footer>
-      </div>
+      <Post
+        v-for="post in posts"
+        v-bind:key="post.id"
+        :color="post.color"
+        :text-color="post.textColor"
+        :subreddit="post.subreddit"
+        :date="post.date"
+        :url="post.url"
+        :domain="post.domain"
+        :is-sticky="post.isSticky"
+        :type="post.type"
+        :thumbnail="post.thumbnail"
+        :title="post.title"
+        :details="post.details"
+        :media-id="post.mediaId"
+        :score="post.score"
+        :comment-count="post.commentCount"
+      ></Post>
       <infinite-loading
         style="height: 100px; margin-top:50px"
         v-if="lastPostId"
@@ -178,6 +78,8 @@ import InfiniteLoading from 'vue-infinite-loading';
 import RotateLoader from 'vue-spinner/src/RotateLoader';
 import VueMarkdown from 'vue-markdown';
 import jump from 'jump.js';
+import Post from '@/components/Post';
+import postType from '@/enums/postType';
 
 const DEFAULT_COLOR = '#c0392b';
 
@@ -398,18 +300,7 @@ export default {
       subredditData: {
         color: DEFAULT_COLOR,
       },
-      postType: {
-        SELF: 'self',
-        VIDEO: 'video',
-        IMAGE: 'image',
-        GIF: 'gif',
-        YOUTUBE: 'youtube',
-        TWITCH: 'twitch',
-        OTHER: 'other',
-        GFYCAT: 'gfycat',
-        VREDDIT: 'vreddit',
-        STREAMABLE: 'streamable',
-      },
+      postType,
       lastPostId: '',
     };
   },
@@ -417,6 +308,7 @@ export default {
     InfiniteLoading,
     RotateLoader,
     VueMarkdown,
+    Post,
   },
 };
 </script>
