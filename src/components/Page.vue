@@ -76,12 +76,38 @@ import numeral from 'numeral';
 import _ from 'lodash';
 import InfiniteLoading from 'vue-infinite-loading';
 import RotateLoader from 'vue-spinner/src/RotateLoader';
-import VueMarkdown from 'vue-markdown';
 import jump from 'jump.js';
 import Post from '@/components/Post';
 import postType from '@/enums/postType';
 
+function getRGBComponents(color) {
+  const r = color.substring(1, 3);
+  const g = color.substring(3, 5);
+  const b = color.substring(5, 7);
+
+  return {
+    R: parseInt(r, 16),
+    G: parseInt(g, 16),
+    B: parseInt(b, 16),
+  };
+}
+
+function getTextColor(bgColor) {
+  if (!bgColor) {
+    return '#000000';
+  }
+  const nThreshold = 105;
+  const components = getRGBComponents(bgColor);
+  const bgDelta = (components.R * 0.299) + (components.G * 0.587) + (components.B * 0.114);
+
+  return ((255 - bgDelta) < nThreshold) ? '#000000' : '#ffffff';
+}
+
 const DEFAULT_COLOR = '#c0392b';
+const DEFAULT_SUBREDDIT_DATA = {
+  color: DEFAULT_COLOR,
+  textColor: getTextColor(DEFAULT_COLOR),
+};
 
 function getStreamableId(url) {
   const regExp = /^.*streamable\.com\/(.*)/;
@@ -119,29 +145,6 @@ function getYoutubeId(url) {
   return undefined;
 }
 
-function getRGBComponents(color) {
-  const r = color.substring(1, 3);
-  const g = color.substring(3, 5);
-  const b = color.substring(5, 7);
-
-  return {
-    R: parseInt(r, 16),
-    G: parseInt(g, 16),
-    B: parseInt(b, 16),
-  };
-}
-
-function getTextColor(bgColor) {
-  if (!bgColor) {
-    return '#000000';
-  }
-  const nThreshold = 105;
-  const components = getRGBComponents(bgColor);
-  const bgDelta = (components.R * 0.299) + (components.G * 0.587) + (components.B * 0.114);
-
-  return ((255 - bgDelta) < nThreshold) ? '#000000' : '#ffffff';
-}
-
 export default {
   name: 'app',
   async created() {
@@ -165,7 +168,7 @@ export default {
     async getColorBySubreddit(subreddit) {
       if (!this.colors[subreddit]) {
         const response = await this.$http.get(`https://www.reddit.com/${subreddit}/about.json`);
-        const color = _.get(response, 'body.data.key_color') || DEFAULT_COLOR;
+        const color = _.get(response, 'body.data.key_color') || DEFAULT_SUBREDDIT_DATA.color;
         this.colors[subreddit] = color;
       }
       return this.colors[subreddit];
@@ -200,9 +203,11 @@ export default {
           headerImg: subredditData.header_img,
           bannerImg: subredditData.banner_img,
           iconImg: subredditData.icon_img,
-          color: subredditData.key_color || DEFAULT_COLOR,
+          color: subredditData.key_color,
         };
         this.subredditData.textColor = getTextColor(this.subredditData.color);
+      } else {
+        this.subredditData = DEFAULT_SUBREDDIT_DATA;
       }
 
       let requestUrl = `https://www.reddit.com/${this.subreddit}.json?limit=10`;
@@ -297,9 +302,7 @@ export default {
       subreddit: '',
       colors: {},
       posts: [],
-      subredditData: {
-        color: DEFAULT_COLOR,
-      },
+      subredditData: DEFAULT_SUBREDDIT_DATA,
       postType,
       lastPostId: '',
     };
@@ -307,7 +310,6 @@ export default {
   components: {
     InfiniteLoading,
     RotateLoader,
-    VueMarkdown,
     Post,
   },
 };

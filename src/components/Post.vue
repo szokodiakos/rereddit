@@ -1,7 +1,7 @@
 <template>
-  <div class="card" style="max-width: 900px; margin: 25px auto;">
+  <div class="card post">
     <header class="card-header" v-bind:style="{ 'background-color': color }">
-      <p class="card-header-title" v-bind:style="{ 'color': textColor }">
+      <p class="card-header-title no-wrap" v-bind:style="{ 'color': textColor }">
         <router-link :to="`/${subreddit}`">{{ subreddit }}</router-link>&nbsp;&middot; {{ date }} &middot; <a :href="url" target="_blank">{{ domain }}</a>
       </p>
     </header>
@@ -24,8 +24,8 @@
         </div>
         <div v-if="type === postType.OTHER">
           <article class="media">
-            <figure class="media-left">
-              <p class="image is-128x128">
+            <figure class="media-left hide-on-mobile">
+              <p class="image width-128">
                 <a :href="url" target="_blank">
                   <img :src="thumbnail">
                 </a>
@@ -35,24 +35,29 @@
               <a :href="url" target="_blank">
                 <p class="title">{{ title }}</p>
               </a>
+              <p class="image width-128 hide-on-desktop center" style="margin-top: 10px;">
+                <a :href="url" target="_blank">
+                  <img :src="thumbnail">
+                </a>
+              </p>
             </div>
           </article>
         </div>
         <br>
         <div v-if="type === postType.VIDEO">
-          <video style="display:block;margin:auto;"  preload="auto" autoplay="autoplay" muted="muted" loop="loop" webkit-playsinline="">
+          <video class="center full-width" preload="auto" autoplay="autoplay" muted="muted" loop="loop" webkit-playsinline="">
             <source :src="url" type="video/mp4"></source>
           </video>
         </div>
         <div v-if="type === postType.IMAGE || type === postType.GIF">
-          <a target="_blank" :href="url"><img style="display:block;margin:auto;" :src="url"></img></a>
+          <a target="_blank" :href="url"><img class="center full-width" :src="url"></img></a>
         </div>
         <div v-if="type === postType.SELF">
-          <p><vue-markdown>{{ details }}</vue-markdown></p>
+          <p class="text-content"><vue-markdown>{{ details }}</vue-markdown></p>
         </div>
         <div v-if="type === postType.YOUTUBE">
           <iframe
-            style="display:block;margin:auto;"
+            class="center full-width"
             width="840"
             height="472"
             :src="`https://www.youtube.com/embed/${mediaId}?rel=0&amp;showinfo=0`"
@@ -62,7 +67,7 @@
         </div>
         <div v-if="type === postType.TWITCH">
           <iframe
-            style="display:block;margin:auto;"
+            class="center full-width"
             :src="`https://clips.twitch.tv/embed?clip=${mediaId}&autoplay=false&tt_medium=clips_embed`"
             width="840"
             height="472"
@@ -72,7 +77,7 @@
           ></iframe>
         </div>
         <div v-if="type === postType.GFYCAT">
-          <div style="position:relative;padding-bottom:57%">
+          <div style="position:relative;padding-bottom:57%" class="full-width">
             <iframe
               :src="`https://gfycat.com/ifr/${mediaId}`"
               frameborder="0"
@@ -84,7 +89,7 @@
             ></iframe>
           </div>
         </div>
-        <div v-if="type === postType.STREAMABLE">
+        <div v-if="type === postType.STREAMABLE" class="full-width">
             <iframe
               :src="`https://streamable.com/s/${mediaId}`"
               frameborder="0"
@@ -121,6 +126,7 @@
 
 <script>
 import postType from '@/enums/postType';
+import VueMarkdown from 'vue-markdown';
 
 export default {
   name: 'post',
@@ -128,6 +134,9 @@ export default {
     return {
       postType,
     };
+  },
+  components: {
+    VueMarkdown,
   },
   props: [
     'color',
@@ -148,4 +157,57 @@ export default {
 };
 </script>
 
+<style>
+@media screen and (max-width: 768px) {
+  .post {
+    width: 100%;
+    margin: 25px auto;
+  }
+
+  .hide-on-mobile {
+    display: none !important;
+  }
+
+  .card-content {
+    padding: 0px;
+  }
+
+  .card-content .title {
+    padding: 1.5rem;
+  }
+
+  .card-content .text-content {
+    padding: 1.5rem;
+  }
+
+  .full-width {
+    width: 100%;
+  }
+}
+
+@media screen and (min-width: 769px) {
+  .post {
+    max-width: 900px;
+    margin: 25px auto;
+  }
+
+  .hide-on-desktop {
+    display: none !important;
+  }
+}
+
+.center {
+  display: block;
+  margin: auto;
+}
+
+.width-128 {
+  width: 128px;
+}
+
+.no-wrap {
+  white-space: nowrap;
+}
+
+</style>
 
