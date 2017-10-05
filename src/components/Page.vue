@@ -4,29 +4,13 @@
       <rotate-loader></rotate-loader>
     </div>
     <div v-else>
-      <section class="hero is-primary is-bold jump-target">
-        <div class="hero-body" v-bind:style="{
-          'background-image': `-webkit-linear-gradient(left, ${subredditData.color}, rgba(0,0,0,0))${subredditData.bannerImg ? `, url(${subredditData.bannerImg})` : ''}`,
-          'background-size': `auto, cover`,
-        }">
-          <div class="container">
-            <h1 class="title" v-bind:style="{ color: subredditData.textColor }">
-              {{ subreddit || 'Rereddit' }}
-            </h1>
-            <h2 class="subtitle" v-bind:style="{ color: subredditData.textColor }">
-              <span v-if="subredditData.title">{{ subredditData.title }}</span>
-              <span v-else>An alternative <i class="fa fa-reddit-alien" aria-hidden="true"></i> client</span>
-            </h2>
-          </div>
-        </div>
-      </section>
-      <!-- <nav class="navbar" role="navigation" aria-label="main navigation">
-        <div class="navbar-menu">
-          <a class="navbar-item">
-            Home
-          </a>
-        </div>
-      </nav> -->
+      <Heading
+        :color="subredditData.color"
+        :banner-img="subredditData.bannerImg"
+        :text-color="subredditData.textColor"
+        :subreddit="subreddit"
+        :title="subredditData.title"
+      ></Heading>
       <a class="button is-large" @click="jumpToTop" v-bind:style="{
         'z-index': 10,
         position: 'fixed',
@@ -83,6 +67,7 @@ import RotateLoader from 'vue-spinner/src/RotateLoader';
 import jump from 'jump.js';
 import he from 'he';
 import Post from '@/components/Post';
+import Heading from '@/components/Heading';
 import postType from '@/enums/postType';
 
 function getRGBComponents(color) {
@@ -320,6 +305,7 @@ export default {
     InfiniteLoading,
     RotateLoader,
     Post,
+    Heading,
   },
 };
 </script>
