@@ -25,6 +25,7 @@
     "numeral": "^2.0.6",
     "tippy.js": "^1.2.2",
     "vue": "^2.4.2",
+    "vue-analytics": "^5.1.1",
     "vue-awesomplete": "^0.1.8",
     "vue-infinite-loading": "^2.2.1",
     "vue-markdown": "^2.2.4",
