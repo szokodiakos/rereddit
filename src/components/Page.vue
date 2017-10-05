@@ -41,11 +41,13 @@
       <Post
         v-for="post in posts"
         v-bind:key="post.id"
+        :id="post.id"
         :color="post.color"
         :text-color="post.textColor"
         :subreddit="post.subreddit"
         :date="post.date"
         :url="post.url"
+        :click-url="post.clickUrl || post.url"
         :domain="post.domain"
         :is-sticky="post.isSticky"
         :type="post.type"
@@ -55,6 +57,7 @@
         :media-id="post.mediaId"
         :score="post.score"
         :comment-count="post.commentCount"
+        :permalink="post.permalink"
       ></Post>
       <infinite-loading
         style="height: 100px; margin-top:50px"
@@ -226,42 +229,44 @@ export default {
         const date = moment.utc(parseInt(`${post.created_utc}000`, 10)).fromNow();
         const domain = post.domain;
         const thumbnail = (!post.thumbnail || post.thumbnail === 'default') ? 'static/reddit.jpeg' : post.thumbnail;
+        const permalink = post.permalink;
         const isSticky = post.stickied;
         let url = post.url;
+        let clickUrl;
         let detailsPromise = Promise.resolve();
         let mediaId;
 
         let type;
-        if (post.url.endsWith('.gifv')) {
-          url = post.url.replace(/gifv$/, 'mp4');
+        if (url.endsWith('.gifv')) {
+          url = url.replace(/gifv$/, 'mp4');
           type = this.postType.VIDEO;
-        } else if (post.url.endsWith('.mp4')) {
+        } else if (url.endsWith('.mp4')) {
           type = this.postType.VIDEO;
-        } else if (post.url.endsWith('.png') || post.url.endsWith('.jpg') || post.domain === 'i.imgur.com') {
+        } else if (url.endsWith('.png') || url.endsWith('.jpg') || domain === 'i.imgur.com') {
           type = this.postType.IMAGE;
-        } else if (post.url.endsWith('.gif')) {
+        } else if (url.endsWith('.gif')) {
           type = this.postType.GIF;
-        } else if (post.domain.startsWith('self.')) {
+        } else if (domain.startsWith('self.')) {
           type = this.postType.SELF;
-          detailsPromise = this.$http.get(`${post.url.slice(0, -1)}.json`);
-        } else if (post.domain === 'imgur.com') {
+          detailsPromise = this.$http.get(`${url.slice(0, -1)}.json`);
+        } else if (url.startsWith('https://imgur.com/a/')) {
           type = this.postType.IMAGE;
-          const imgurId = url.split('/').slice(-1)[0];
-          url = `https://i.imgur.com/${imgurId}.jpg`;
-        } else if (post.domain.endsWith('youtube.com') || post.domain === 'youtu.be') {
+          clickUrl = url;
+          url = _.get(post, 'media.oembed.thumbnail_url', '').replace('?fb', '');
+        } else if (domain.endsWith('youtube.com') || domain === 'youtu.be') {
           type = this.postType.YOUTUBE;
-          mediaId = getYoutubeId(post.url);
-        } else if (post.domain === 'clips.twitch.tv') {
+          mediaId = getYoutubeId(url);
+        } else if (domain === 'clips.twitch.tv') {
           type = this.postType.TWITCH;
-          mediaId = getTwitchId(post.url);
-        } else if (post.domain === 'gfycat.com') {
+          mediaId = getTwitchId(url);
+        } else if (domain === 'gfycat.com') {
           type = this.postType.GFYCAT;
-          mediaId = getGfycatId(post.url);
-        // } else if (post.domain === 'v.redd.it') {
+          mediaId = getGfycatId(url);
+        // } else if (domain === 'v.redd.it') {
         //   type = this.postType.VREDDIT;
-        } else if (post.domain === 'streamable.com') {
+        } else if (domain === 'streamable.com') {
           type = this.postType.STREAMABLE;
-          mediaId = getStreamableId(post.url);
+          mediaId = getStreamableId(url);
         } else {
           type = this.postType.OTHER;
         }
@@ -281,6 +286,8 @@ export default {
           thumbnail,
           mediaId,
           isSticky,
+          permalink,
+          clickUrl,
         };
       });
       const populatedPosts = await this.populatePostDetails(posts);

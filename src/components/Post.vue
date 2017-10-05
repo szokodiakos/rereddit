@@ -2,14 +2,14 @@
   <div class="card post">
     <header class="card-header" v-bind:style="{ 'background-color': color }">
       <p class="card-header-title no-wrap" v-bind:style="{ 'color': textColor }">
-        <router-link :to="`/${subreddit}`">{{ subreddit }}</router-link>&nbsp;&middot; {{ date }} &middot; <a :href="url" target="_blank">{{ domain }}</a>
+        <router-link :to="`/${subreddit}`">{{ subreddit }}</router-link>&nbsp;&middot; {{ date }} &middot; <a :href="clickUrl" target="_blank">{{ domain }}</a>
       </p>
     </header>
     <div class="card-content">
       <div class="content">
         <div v-if="type !== postType.OTHER">
           <p class="title">
-            <a :href="url" target="_blank">
+            <a :href="clickUrl" target="_blank">
               <b-icon
                 v-if="isSticky"
                 style="padding-left: 5px; color: #e74c3c;"
@@ -26,17 +26,17 @@
           <article class="media">
             <figure class="media-left hide-on-mobile">
               <p class="image width-128">
-                <a :href="url" target="_blank">
+                <a :href="clickUrl" target="_blank">
                   <img :src="thumbnail">
                 </a>
               </p>
             </figure>
             <div class="media-content">
-              <a :href="url" target="_blank">
+              <a :href="clickUrl" target="_blank">
                 <p class="title">{{ title }}</p>
               </a>
               <p class="image width-128 hide-on-desktop center" style="margin-top: 10px;">
-                <a :href="url" target="_blank">
+                <a :href="clickUrl" target="_blank">
                   <img :src="thumbnail">
                 </a>
               </p>
@@ -50,7 +50,7 @@
           </video>
         </div>
         <div v-if="type === postType.IMAGE || type === postType.GIF">
-          <a target="_blank" :href="url"><img class="center full-width" :src="url"></img></a>
+          <a target="_blank" :href="clickUrl"><img class="center full-width" :src="url"></img></a>
         </div>
         <div v-if="type === postType.SELF">
           <p class="text-content"><vue-markdown>{{ details }}</vue-markdown></p>
@@ -58,8 +58,8 @@
         <div v-if="type === postType.YOUTUBE">
           <iframe
             class="center full-width"
-            width="840"
-            height="472"
+            width="640"
+            height="360"
             :src="`https://www.youtube.com/embed/${mediaId}?rel=0&amp;showinfo=0`"
             frameborder="0"
             allowfullscreen
@@ -69,8 +69,8 @@
           <iframe
             class="center full-width"
             :src="`https://clips.twitch.tv/embed?clip=${mediaId}&autoplay=false&tt_medium=clips_embed`"
-            width="840"
-            height="472"
+            width="640"
+            height="360"
             frameborder="0"
             scrolling="no"
             allowfullscreen="true"
@@ -93,8 +93,8 @@
             <iframe
               :src="`https://streamable.com/s/${mediaId}`"
               frameborder="0"
-              width="840"
-              height="472"
+              width="640"
+              height="360"
               allowfullscreen
             ></iframe>
         </div>
@@ -114,7 +114,19 @@
           <b-icon pack="fa" icon="arrow-down"></b-icon>
         </a> -->
       </label>
-      <a href="#" class="card-footer-item" style="text-transform: uppercase;">
+      <a class="card-footer-item" style="text-transform: uppercase;">
+      <!-- <a @mouseover="loadTopComments(permalink)" v-tippy="{ theme: 'light', arrow: true, interactive: true }" class="card-footer-item" style="text-transform: uppercase;" :data-html="`#tooltip-content-${id}`">
+        <div :id="`tooltip-content-${id}`" style="display:none">
+          <div v-if="areCommentsLoading">
+            <rotate-loader></rotate-loader>
+          </div>
+          <div v-else>
+            <div v-for="comment in comments" v-bind:key="comment.id">
+              <strong>{{ comment.author }}</strong>: {{ comment.body }}
+              <br>
+            </div>
+          </div>
+        </div> -->
         <b-icon style="margin-right: 8px;" pack="fa" icon="comments-o"></b-icon>{{ commentCount }}
       </a>
       <!-- <a href="#" class="card-footer-item">
@@ -127,23 +139,44 @@
 <script>
 import postType from '@/enums/postType';
 import VueMarkdown from 'vue-markdown';
+import RotateLoader from 'vue-spinner/src/RotateLoader';
+import _ from 'lodash';
 
 export default {
   name: 'post',
   data() {
     return {
       postType,
+      areCommentsLoading: false,
+      comments: [],
     };
+  },
+  methods: {
+    async loadTopComments(permalink) {
+      this.areCommentsLoading = true;
+      const response = await this.$http.get(`https://www.reddit.com${permalink}.json`);
+      const comments = _.get(response, 'body[1].data.children', []);
+      this.comments = comments.slice(0, 3).map(({ data: comment }) => ({
+        id: comment.id,
+        author: comment.author,
+        body: comment.body_html,
+        score: comment.score,
+      }));
+      this.areCommentsLoading = false;
+    },
   },
   components: {
     VueMarkdown,
+    RotateLoader,
   },
   props: [
+    'id',
     'color',
     'textColor',
     'subreddit',
     'date',
     'url',
+    'clickUrl',
     'domain',
     'isSticky',
     'type',
@@ -153,6 +186,7 @@ export default {
     'mediaId',
     'score',
     'commentCount',
+    'permalink',
   ],
 };
 </script>
@@ -187,7 +221,7 @@ export default {
 
 @media screen and (min-width: 769px) {
   .post {
-    max-width: 900px;
+    max-width: 700px;
     margin: 25px auto;
   }
 
