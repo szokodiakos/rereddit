@@ -2,7 +2,11 @@
   <div class="card post">
     <header class="card-header" v-bind:style="{ 'background-color': color }">
       <p class="card-header-title no-wrap" v-bind:style="{ 'color': textColor }">
-        <router-link :to="`/${subreddit}`">{{ subreddit }}</router-link>&nbsp;&middot; {{ date }} &middot; <a :href="clickUrl" target="_blank">{{ domain }}</a>
+        <router-link :to="`/${subreddit}`">{{ subreddit }}</router-link>
+        &nbsp;&middot;
+        {{ date }}
+        &middot;&nbsp;
+        <a :href="clickUrl" target="_blank">{{ domain }}</a>
       </p>
     </header>
     <div class="card-content">
@@ -43,7 +47,7 @@
             </div>
           </article>
         </div>
-        <br>
+        <br v-if="type !== postType.OTHER">
         <div v-if="type === postType.VIDEO">
           <video class="center full-width" preload="auto" autoplay="autoplay" muted="muted" loop="loop" webkit-playsinline="">
             <source :src="url" type="video/mp4"></source>
@@ -103,30 +107,52 @@
       </div>
     </div>
     <footer class="card-footer">
-      <label class="card-footer-item" style="text-transform: uppercase;">
+      <label class="card-footer-item" style="text-transform: uppercase; color: #2ecc71;">
         <!-- <a href="#" class="card-footer-item">
           <b-icon pack="fa" icon="arrow-up"></b-icon>
         </a>
         <label class="card-footer-item" style="text-transform: uppercase;"> -->
-          <b-icon style="margin-right: 8px;" pack="fa" icon="star-half-o"></b-icon> {{ score }}
+          <b-icon style="margin-right: 8px;" pack="fa" icon="arrow-up"></b-icon> {{ score }}
         <!-- </label>
         <a href="#" class="card-footer-item">
           <b-icon pack="fa" icon="arrow-down"></b-icon>
         </a> -->
       </label>
-      <a class="card-footer-item" style="text-transform: uppercase;">
-      <!-- <a @mouseover="loadTopComments(permalink)" v-tippy="{ theme: 'light', arrow: true, interactive: true }" class="card-footer-item" style="text-transform: uppercase;" :data-html="`#tooltip-content-${id}`">
+      <a @mouseover="loadTopComments(permalink)" v-tippy="{
+        theme: 'light',
+        arrow: true,
+        interactive: true,
+        size: 'small',
+        sticky: true,
+        delay: [300, 100]
+      }" class="card-footer-item" style="text-transform: uppercase;" :data-html="`#tooltip-content-${id}`">
         <div :id="`tooltip-content-${id}`" style="display:none">
+          <strong>
+            <b-icon pack="fa" icon="trophy" size="is-small" style="margin-bottom: 4px;"></b-icon> Top Comments
+          </strong>
           <div v-if="areCommentsLoading">
-            <rotate-loader></rotate-loader>
+            <rotate-loader style="margin-top: 14%;"></rotate-loader>
           </div>
-          <div v-else>
-            <div v-for="comment in comments" v-bind:key="comment.id">
-              <strong>{{ comment.author }}</strong>: {{ comment.body }}
+          <div v-else style="padding: 10px">
+            <article class="media" v-for="comment in comments" v-bind:key="comment.id">
+              <div class="media-content">
+                <div class="content">
+                  <strong>{{ comment.author }}</strong>
+                  &middot;
+                  {{ comment.date }}
+                  &middot;
+                  <b-icon pack="fa" icon="arrow-up" size="is-small" style="margin-bottom: 4px; color: #2ecc71"></b-icon>
+                  <span style="color: #2ecc71; text-transform: uppercase;">{{ comment.score }}</span>
+                  <b-icon v-if="comment.isGilded" pack="fa" icon="star" size="is-small" style="margin-bottom: 3px; color: #FFD700"></b-icon>
+                  <strong v-if="comment.isOP" style="color: #3498db; text-transform: uppercase;">op</strong>
+                  <br>
+                  <span v-html="comment.body"></span>
+                </div>
+              </div>
               <br>
-            </div>
+            </article>
           </div>
-        </div> -->
+        </div>
         <b-icon style="margin-right: 8px;" pack="fa" icon="comments-o"></b-icon>{{ commentCount }}
       </a>
       <!-- <a href="#" class="card-footer-item">
@@ -141,6 +167,9 @@ import postType from '@/enums/postType';
 import VueMarkdown from 'vue-markdown';
 import RotateLoader from 'vue-spinner/src/RotateLoader';
 import _ from 'lodash';
+import he from 'he';
+import moment from 'moment';
+import numeral from 'numeral';
 
 export default {
   name: 'post',
@@ -153,16 +182,22 @@ export default {
   },
   methods: {
     async loadTopComments(permalink) {
-      this.areCommentsLoading = true;
-      const response = await this.$http.get(`https://www.reddit.com${permalink}.json`);
-      const comments = _.get(response, 'body[1].data.children', []);
-      this.comments = comments.slice(0, 3).map(({ data: comment }) => ({
-        id: comment.id,
-        author: comment.author,
-        body: comment.body_html,
-        score: comment.score,
-      }));
-      this.areCommentsLoading = false;
+      if (_.isEmpty(this.comments)) {
+        this.areCommentsLoading = true;
+        const response = await this.$http.get(`https://www.reddit.com${permalink}.json`);
+        const comments = _.get(response, 'body[1].data.children', []);
+        const format = n => (n > 1000 ? '0.0a' : '0a');
+        this.comments = comments.slice(0, 3).map(({ data: comment }) => ({
+          id: comment.id,
+          author: comment.author,
+          body: he.decode(comment.body_html),
+          score: numeral(comment.score).format(format(comment.score)),
+          date: moment.utc(parseInt(`${comment.created_utc}000`, 10)).fromNow(),
+          isOP: comment.is_submitter,
+          isGilded: comment.gilded > 0,
+        }));
+        this.areCommentsLoading = false;
+      }
     },
   },
   components: {
@@ -187,6 +222,7 @@ export default {
     'score',
     'commentCount',
     'permalink',
+    'author',
   ],
 };
 </script>
@@ -241,6 +277,11 @@ export default {
 
 .no-wrap {
   white-space: nowrap;
+}
+
+.tippy-tooltip.light-theme {
+  min-height: 200px;
+  width: 680px;
 }
 
 </style>

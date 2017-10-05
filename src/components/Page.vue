@@ -43,6 +43,7 @@
         v-bind:key="post.id"
         :id="post.id"
         :color="post.color"
+        :author="post.author"
         :text-color="post.textColor"
         :subreddit="post.subreddit"
         :date="post.date"
@@ -80,6 +81,7 @@ import _ from 'lodash';
 import InfiniteLoading from 'vue-infinite-loading';
 import RotateLoader from 'vue-spinner/src/RotateLoader';
 import jump from 'jump.js';
+import he from 'he';
 import Post from '@/components/Post';
 import postType from '@/enums/postType';
 
@@ -184,7 +186,7 @@ export default {
 
       return Promise.all(posts.map(async (post) => {
         const rawDetails = await post.detailsPromise;
-        const details = _.get(rawDetails, 'body.[0].data.children[0].data.selftext');
+        const details = he.decode(_.get(rawDetails, 'body.[0].data.children[0].data.selftext', ''));
         const color = await this.getColorBySubreddit(post.subreddit);
         const textColor = getTextColor(color);
         return {
@@ -220,7 +222,7 @@ export default {
       const response = await this.$http.get(requestUrl);
       const posts = response.body.data.children.map(({ data: post }) => {
         const id = post.id;
-        const title = post.title;
+        const title = he.decode(post.title);
         const format = n => (n > 1000 ? '0.0a' : '0a');
         const score = numeral(post.score).format(format(post.score));
         const commentCount = numeral(post.num_comments).format(format(post.num_comments));

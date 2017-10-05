@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import VueTippy from 'vue-tippy';
 import VueResource from 'vue-resource';
 import Buefy from 'buefy';
 import moment from 'moment';
@@ -28,6 +29,7 @@ moment.updateLocale('en', {
 
 Vue.use(Buefy);
 Vue.use(VueResource);
+Vue.use(VueTippy);
 
 /* eslint-disable no-new */
 new Vue({
