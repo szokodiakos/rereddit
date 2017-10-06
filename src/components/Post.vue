@@ -44,6 +44,7 @@
                   <img :src="thumbnail">
                 </a>
               </p>
+              <br>
             </div>
           </article>
         </div>
@@ -104,6 +105,7 @@
         </div>
         <!-- <div v-if="type === postType.VREDDIT">
         </div> -->
+        <br v-if="type !== postType.OTHER" class="hide-on-desktop">
       </div>
     </div>
     <footer class="card-footer">
@@ -131,7 +133,7 @@
             <b-icon pack="fa" icon="trophy" size="is-small" style="margin-bottom: 4px;"></b-icon> Top Comments
           </strong>
           <div v-if="areCommentsLoading">
-            <rotate-loader style="margin-top: 14%;"></rotate-loader>
+            <rotate-loader style="margin-top: 14%; margin-bottom: 13%;"></rotate-loader>
           </div>
           <div v-else style="padding: 10px">
             <article class="media" v-for="comment in comments" v-bind:key="comment.id">
@@ -149,9 +151,9 @@
                   <span v-html="comment.body"></span>
                 </div>
               </div>
-              <br>
             </article>
           </div>
+          <!-- <button class="button is-primary" style="width: 55%; margin-bottom: 10px;">Close</button> -->
         </div>
         <b-icon style="margin-right: 8px;" pack="fa" icon="comments-o"></b-icon>{{ commentCount }}
       </a>
