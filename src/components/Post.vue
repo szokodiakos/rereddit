@@ -120,7 +120,7 @@
           <b-icon pack="fa" icon="arrow-down"></b-icon>
         </a> -->
       </label>
-      <a @mouseover="loadTopComments(permalink)" v-tippy="{
+      <a @mouseover="loadTopComments(permalink)" ref="tippy" v-tippy="{
         theme: 'light',
         arrow: true,
         interactive: true,
@@ -153,7 +153,15 @@
               </div>
             </article>
           </div>
-          <!-- <button class="button is-primary" style="width: 55%; margin-bottom: 10px;">Close</button> -->
+          <button
+            @click="closeTooltip"
+            :onclick="`document.getElementById('close-tooltip-${id}').click()`"
+            :id="`close-tooltip-${id}`"
+            class="button is-primary hide-on-desktop"
+            style="width: 55%; margin-bottom: 10px;"
+          >
+            Close
+          </button>
         </div>
         <b-icon style="margin-right: 8px;" pack="fa" icon="comments-o"></b-icon>{{ commentCount }}
       </a>
@@ -183,6 +191,9 @@ export default {
     };
   },
   methods: {
+    closeTooltip() {
+      this.$tippy.hidePopper(this.$refs.tippy);
+    },
     async loadTopComments(permalink) {
       if (_.isEmpty(this.comments)) {
         this.areCommentsLoading = true;
