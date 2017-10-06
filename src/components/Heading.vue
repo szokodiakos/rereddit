@@ -12,6 +12,10 @@
           <span v-if="title">{{ title }}</span>
           <span v-else>An alternative <i class="fa fa-reddit-alien" aria-hidden="true"></i> client</span>
         </h2>
+      <!-- https://www.reddit.com/subreddits/search.json?q=wow&limit=5 -->
+      <!-- <div>
+        /r/ <input @focus="stopTyped" @blur="startTyped" class="go-to-subreddit" type="text"> <button>Go</button>
+      </div> -->
       </div>
     </div>
   </section>
@@ -25,6 +29,9 @@
 </template>
 
 <script>
+import Typed from 'typed.js';
+// import _ from 'lodash';
+
 export default {
   name: 'heading',
   props: [
@@ -34,9 +41,43 @@ export default {
     'subreddit',
     'title',
   ],
+  data() {
+    return {
+      typed: null,
+      subreddits: [],
+    };
+  },
+  methods: {
+    stopTyped() {
+      this.typed.destroy();
+      this.typed = null;
+    },
+    startTyped() {
+      this.typed = new Typed('.go-to-subreddit', {
+        strings: this.subreddits,
+        attr: 'placeholder',
+        typeSpeed: 40,
+        backSpeed: 40,
+        shuffle: true,
+        loop: true,
+      });
+    },
+  },
+  // async mounted() {
+  //   const response = await this.$http.get('https://www.reddit.com/reddits/.json');
+  //   this.subreddits = _
+  //     .get(response, 'body.data.children', [])
+  //     .map(rawSubreddit => rawSubreddit.data.display_name);
+  //   this.$nextTick(() => {
+  //     this.startTyped();
+  //   });
+  // },
 };
 </script>
 
 <style>
-
+.center {
+  display: block;
+  margin: auto;
+}
 </style>

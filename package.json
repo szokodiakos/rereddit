@@ -24,6 +24,7 @@
     "moment": "^2.18.1",
     "numeral": "^2.0.6",
     "tippy.js": "^1.2.2",
+    "typed.js": "^2.0.6",
     "vue": "^2.4.2",
     "vue-analytics": "^5.1.1",
     "vue-awesomplete": "^0.1.8",
