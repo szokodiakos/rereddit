@@ -48,7 +48,7 @@
             </div>
           </article>
         </div>
-        <br v-if="type !== postType.OTHER">
+        <br v-if="type !== postType.OTHER" class="hide-on-mobile">
         <div v-if="type === postType.VIDEO">
           <video class="center full-width" preload="auto" autoplay="autoplay" muted="muted" loop="loop" webkit-playsinline="">
             <source :src="url" type="video/mp4"></source>
@@ -57,7 +57,7 @@
         <div v-if="type === postType.IMAGE || type === postType.GIF">
           <a target="_blank" :href="clickUrl"><img class="center full-width" :src="url"></img></a>
         </div>
-        <div v-if="type === postType.SELF">
+        <div v-if="type === postType.SELF && details">
           <p class="text-content"><vue-markdown>{{ details }}</vue-markdown></p>
         </div>
         <div v-if="type === postType.YOUTUBE">
