@@ -12,8 +12,18 @@ export default new Router({
       component: Page,
     },
     {
+      path: '/:modifier',
+      name: 'front-page-with-modifier',
+      component: Page,
+    },
+    {
       path: '/r/:subreddit',
       name: 'subreddit-page',
+      component: Page,
+    },
+    {
+      path: '/r/:subreddit/:modifier',
+      name: 'subreddit-page-with-modifier',
       component: Page,
     },
   ],

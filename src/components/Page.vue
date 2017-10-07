@@ -24,42 +24,57 @@
           <i class="fa fa-chevron-up" v-bind:style="{ color: subredditData.textColor }"></i>
         </span>
       </a>
-      <div v-if="!posts.length" style="display: flex; justify-content: center;">
-        <h2 class="title is-2" style="margin-top: 25px; color: #95a5a6;">No posts <b-icon pack="fa" icon="frown-o" size="is-large"></b-icon></h2>
+      <div class="tabs is-centered">
+        <ul>
+          <li v-for="tab in tabs" v-bind:key="tab.name" v-bind:class="{ 'is-active': isActiveTab(tab) }">
+            <router-link :to="getRouteLink(tab)" style="height: 41px;">
+              <i :class="`fa fa-${tab.icon}`"></i>
+              <span v-bind:class="{ 'hide-on-mobile': !isActiveTab(tab) }">&nbsp;{{ tab.name }}</span>
+            </router-link>
+          </li>
+        </ul>
       </div>
-      <Post
-        v-for="post in posts"
-        v-bind:key="post.id"
-        :id="post.id"
-        :color="post.color"
-        :author="post.author"
-        :text-color="post.textColor"
-        :subreddit="post.subreddit"
-        :date="post.date"
-        :url="post.url"
-        :click-url="post.clickUrl || post.url"
-        :domain="post.domain"
-        :is-sticky="post.isSticky"
-        :type="post.type"
-        :thumbnail="post.thumbnail"
-        :title="post.title"
-        :details="post.details"
-        :media-id="post.mediaId"
-        :score="post.score"
-        :comment-count="post.commentCount"
-        :permalink="post.permalink"
-        :tag="post.tag"
-      ></Post>
-      <infinite-loading
-        style="height: 100px; margin-top:50px"
-        v-if="lastPostId"
-        @infinite="infiniteHandler"
-        v-bind:distance="2000"
-      >
-        <span slot="spinner">
-          <rotate-loader></rotate-loader>
-        </span>
-      </infinite-loading>
+      <div v-if="isModifierLoad" style="position: absolute;left: 50%;top: 50%;-webkit-transform: translate(-50%, -50%);transform: translate(-50%, -50%);">
+        <rotate-loader></rotate-loader>
+      </div>
+      <div v-else>
+        <div v-if="!posts.length" style="display: flex; justify-content: center;">
+          <h2 class="title is-2" style="margin-top: 25px; color: #95a5a6;">No posts <b-icon pack="fa" icon="frown-o" size="is-large"></b-icon></h2>
+        </div>
+        <Post
+          v-for="post in posts"
+          v-bind:key="post.id"
+          :id="post.id"
+          :color="post.color"
+          :author="post.author"
+          :text-color="post.textColor"
+          :subreddit="post.subreddit"
+          :date="post.date"
+          :url="post.url"
+          :click-url="post.clickUrl || post.url"
+          :domain="post.domain"
+          :is-sticky="post.isSticky"
+          :type="post.type"
+          :thumbnail="post.thumbnail"
+          :title="post.title"
+          :details="post.details"
+          :media-id="post.mediaId"
+          :score="post.score"
+          :comment-count="post.commentCount"
+          :permalink="post.permalink"
+          :tag="post.tag"
+        ></Post>
+        <infinite-loading
+          style="height: 100px; margin-top:50px"
+          v-if="lastPostId"
+          @infinite="infiniteHandler"
+          v-bind:distance="2000"
+        >
+          <span slot="spinner">
+            <rotate-loader></rotate-loader>
+          </span>
+        </infinite-loading>
+      </div>
     </div>
   </div>
 </template>
@@ -145,24 +160,56 @@ export default {
   name: 'app',
   async created() {
     this.subreddit = this.$route.params.subreddit ? `/r/${this.$route.params.subreddit}` : '';
-    this.setTitle();
+    this.setTitle(this.subreddit);
     this.posts = await this.getPosts();
     this.isInitialLoad = false;
   },
   watch: {
-    async $route() {
+    async $route(to, from) {
+      if (to.params.subreddit === from.params.subreddit) {
+        this.isModifierLoad = true;
+      } else {
+        this.isInitialLoad = true;
+        this.subreddit = this.$route.params.subreddit ? `/r/${this.$route.params.subreddit}` : '';
+        this.setTitle(this.subreddit);
+      }
       this.posts = [];
-      this.isInitialLoad = true;
-      this.subreddit = this.$route.params.subreddit ? `/r/${this.$route.params.subreddit}` : '';
-      this.setTitle();
       this.posts = await this.getPosts();
       this.isInitialLoad = false;
+      this.isModifierLoad = false;
     },
   },
   methods: {
-    setTitle() {
-      if (this.subreddit) {
-        document.title = `${this.subreddit} - Rereddit`;
+    getRouteLink(tab) {
+      const currentModifier = this.$route.params.modifier || '';
+      const tabModifier = tab.path || '';
+
+      if (currentModifier === tabModifier) {
+        return this.$route.path;
+      }
+
+      if (!currentModifier) {
+        if (this.$route.path === '/') {
+          return `${this.$route.path}${tabModifier}`;
+        }
+        return `${this.$route.path}/${tabModifier}`;
+      }
+
+      if (!tabModifier) {
+        const result = this.$route.path.replace(`/${currentModifier}`, tabModifier);
+        if (!result) {
+          return '/';
+        }
+        return result;
+      }
+      return this.$route.path.replace(currentModifier, tabModifier);
+    },
+    isActiveTab(tab) {
+      return tab.path === this.$route.params.modifier;
+    },
+    setTitle(subreddit) {
+      if (subreddit) {
+        document.title = `${subreddit} - Rereddit`;
       } else {
         document.title = 'Rereddit - alternative Reddit client';
       }
@@ -215,7 +262,8 @@ export default {
         this.subredditData = DEFAULT_SUBREDDIT_DATA;
       }
 
-      let requestUrl = `https://www.reddit.com/${this.subreddit}.json?limit=10`;
+      const modifier = this.$route.params.modifier;
+      let requestUrl = `https://www.reddit.com/${this.subreddit}${modifier ? `/${modifier}` : ''}.json?limit=10`;
       if (after) {
         requestUrl += `&after=t3_${after}`;
       }
@@ -312,7 +360,29 @@ export default {
   },
   data() {
     return {
+      tabs: [{
+        name: 'Hot',
+        icon: 'fire',
+        path: undefined,
+      }, {
+        name: 'New',
+        icon: 'bolt',
+        path: 'new',
+      }, {
+        name: 'Rising',
+        icon: 'line-chart',
+        path: 'rising',
+      }, {
+        name: 'Controversial',
+        icon: 'compress',
+        path: 'controversial',
+      }, {
+        name: 'Top',
+        icon: 'trophy',
+        path: 'top',
+      }],
       isInitialLoad: true,
+      isModifierLoad: false,
       subreddit: '',
       colors: {},
       posts: [],
