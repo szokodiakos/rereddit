@@ -159,8 +159,7 @@ function getYoutubeId(url) {
 export default {
   name: 'app',
   async created() {
-    this.subreddit = this.$route.params.subreddit ? `/r/${this.$route.params.subreddit}` : '';
-    this.setTitle(this.subreddit);
+    this.setTitle();
     this.posts = await this.getPosts();
     this.isInitialLoad = false;
   },
@@ -170,13 +169,17 @@ export default {
         this.isModifierLoad = true;
       } else {
         this.isInitialLoad = true;
-        this.subreddit = this.$route.params.subreddit ? `/r/${this.$route.params.subreddit}` : '';
-        this.setTitle(this.subreddit);
+        this.setTitle();
       }
       this.posts = [];
       this.posts = await this.getPosts();
       this.isInitialLoad = false;
       this.isModifierLoad = false;
+    },
+  },
+  computed: {
+    subreddit() {
+      return this.$route.params.subreddit ? `/r/${this.$route.params.subreddit}` : '';
     },
   },
   methods: {
@@ -383,7 +386,6 @@ export default {
       }],
       isInitialLoad: true,
       isModifierLoad: false,
-      subreddit: '',
       colors: {},
       posts: [],
       subredditData: DEFAULT_SUBREDDIT_DATA,
