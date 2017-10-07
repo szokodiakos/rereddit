@@ -24,6 +24,7 @@
               ></b-icon>
               {{ title }}
             </a>
+            <span v-if="tag" class="tag">{{ tag }}</span>
           </p>
         </div>
         <div v-if="type === postType.OTHER">
@@ -37,7 +38,7 @@
             </figure>
             <div class="media-content">
               <a :href="clickUrl" target="_blank">
-                <p class="title">{{ title }}</p>
+                <p class="title">{{ title }} <span v-if="tag" class="tag">{{ tag }}</span></p>
               </a>
               <p class="image width-128 hide-on-desktop center" style="margin-top: 10px;">
                 <a :href="clickUrl" target="_blank">
@@ -243,6 +244,7 @@ export default {
     'commentCount',
     'permalink',
     'author',
+    'tag',
   ],
 };
 </script>
@@ -303,6 +305,10 @@ export default {
   min-height: 200px;
   width: 680px;
   max-width: 100%;
+}
+
+.tag {
+  text-transform: uppercase;
 }
 
 </style>

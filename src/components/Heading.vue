@@ -95,7 +95,11 @@ export default {
   methods: {
     openSubreddit() {
       const subreddit = this.$refs.subredditSearch.value;
-      this.$router.push({ name: 'subreddit-page', params: { subreddit } });
+      if (subreddit) {
+        this.$router.push({ name: 'subreddit-page', params: { subreddit } });
+      } else {
+        this.$router.push({ name: 'front-page' });
+      }
     },
     isActive(result) {
       return (this.mouseoveredResult === result);

@@ -46,6 +46,7 @@
         :score="post.score"
         :comment-count="post.commentCount"
         :permalink="post.permalink"
+        :tag="post.tag"
       ></Post>
       <infinite-loading
         style="height: 100px; margin-top:50px"
@@ -142,7 +143,7 @@ export default {
   name: 'app',
   async created() {
     this.subreddit = this.$route.params.subreddit ? `/r/${this.$route.params.subreddit}` : '';
-    document.title = `${this.subreddit} - Rereddit`;
+    this.setTitle();
     this.posts = await this.getPosts();
     this.isInitialLoad = false;
   },
@@ -151,12 +152,19 @@ export default {
       this.posts = [];
       this.isInitialLoad = true;
       this.subreddit = this.$route.params.subreddit ? `/r/${this.$route.params.subreddit}` : '';
-      document.title = `${this.subreddit} - Rereddit`;
+      this.setTitle();
       this.posts = await this.getPosts();
       this.isInitialLoad = false;
     },
   },
   methods: {
+    setTitle() {
+      if (this.subreddit) {
+        document.title = `${this.subreddit} - Rereddit`;
+      } else {
+        document.title = 'Rereddit - alternative Reddit client';
+      }
+    },
     jumpToTop() {
       jump('.jump-target');
     },
@@ -223,6 +231,7 @@ export default {
         const thumbnail = (!post.thumbnail || post.thumbnail === 'default') ? 'static/reddit.jpeg' : post.thumbnail;
         const permalink = post.permalink;
         const isSticky = post.stickied;
+        const tag = post.link_flair_text;
         let url = post.url;
         let clickUrl;
         let detailsPromise = Promise.resolve();
@@ -284,6 +293,7 @@ export default {
           isSticky,
           permalink,
           clickUrl,
+          tag,
         };
       });
       const populatedPosts = await this.populatePostDetails(posts);
