@@ -22,6 +22,9 @@
           <i class="fa fa-chevron-up" v-bind:style="{ color: subredditData.textColor }"></i>
         </span>
       </a>
+      <div v-if="!posts.length" style="display: flex; justify-content: center;">
+        <h2 class="title is-2" style="margin-top: 25px; color: #95a5a6;">No posts <b-icon pack="fa" icon="frown-o" size="is-large"></b-icon></h2>
+      </div>
       <Post
         v-for="post in posts"
         v-bind:key="post.id"
@@ -139,6 +142,7 @@ export default {
   name: 'app',
   async created() {
     this.subreddit = this.$route.params.subreddit ? `/r/${this.$route.params.subreddit}` : '';
+    document.title = `${this.subreddit} - Rereddit`;
     this.posts = await this.getPosts();
     this.isInitialLoad = false;
   },
@@ -147,6 +151,7 @@ export default {
       this.posts = [];
       this.isInitialLoad = true;
       this.subreddit = this.$route.params.subreddit ? `/r/${this.$route.params.subreddit}` : '';
+      document.title = `${this.subreddit} - Rereddit`;
       this.posts = await this.getPosts();
       this.isInitialLoad = false;
     },
@@ -193,7 +198,7 @@ export default {
           headerImg: subredditData.header_img,
           bannerImg: subredditData.banner_img,
           iconImg: subredditData.icon_img,
-          color: subredditData.key_color,
+          color: subredditData.key_color || DEFAULT_COLOR,
         };
         this.subredditData.textColor = getTextColor(this.subredditData.color);
       } else {
@@ -229,17 +234,20 @@ export default {
           type = this.postType.VIDEO;
         } else if (url.endsWith('.mp4')) {
           type = this.postType.VIDEO;
-        } else if (url.endsWith('.png') || url.endsWith('.jpg') || domain === 'i.imgur.com') {
-          type = this.postType.IMAGE;
-        } else if (url.endsWith('.gif')) {
-          type = this.postType.GIF;
-        } else if (domain.startsWith('self.')) {
-          type = this.postType.SELF;
-          detailsPromise = this.$http.get(`${url.slice(0, -1)}.json`);
         } else if (url.startsWith('https://imgur.com/a/')) {
           type = this.postType.IMAGE;
           clickUrl = url;
           url = _.get(post, 'media.oembed.thumbnail_url', '').replace('?fb', '');
+        } else if (url.endsWith('.gif')) {
+          type = this.postType.GIF;
+        } else if (url.endsWith('.png') || url.endsWith('.jpg') || domain === 'i.imgur.com') {
+          type = this.postType.IMAGE;
+        } else if (domain === 'imgur.com') {
+          type = this.postType.IMAGE;
+          url = `${url.replace('imgur.com', 'i.imgur.com')}.jpg`;
+        } else if (domain.startsWith('self.')) {
+          type = this.postType.SELF;
+          detailsPromise = this.$http.get(`${url.slice(0, -1)}.json`);
         } else if (domain.endsWith('youtube.com') || domain === 'youtu.be') {
           type = this.postType.YOUTUBE;
           mediaId = getYoutubeId(url);
@@ -251,6 +259,7 @@ export default {
           mediaId = getGfycatId(url);
         // } else if (domain === 'v.redd.it') {
         //   type = this.postType.VREDDIT;
+        // instagram
         } else if (domain === 'streamable.com') {
           type = this.postType.STREAMABLE;
           mediaId = getStreamableId(url);

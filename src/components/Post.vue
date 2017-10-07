@@ -57,7 +57,7 @@
         <div v-if="type === postType.IMAGE || type === postType.GIF">
           <a target="_blank" :href="clickUrl"><img class="center full-width" :src="url"></img></a>
         </div>
-        <div v-if="type === postType.SELF && details">
+        <div v-if="type === postType.SELF && details" style="overflow-x: auto;">
           <p class="text-content"><vue-markdown>{{ details }}</vue-markdown></p>
         </div>
         <div v-if="type === postType.YOUTUBE">
@@ -101,6 +101,7 @@
               width="640"
               height="360"
               allowfullscreen
+              style="max-width: 100%"
             ></iframe>
         </div>
         <!-- <div v-if="type === postType.VREDDIT">
@@ -136,6 +137,9 @@
             <rotate-loader style="margin-top: 14%; margin-bottom: 13%;"></rotate-loader>
           </div>
           <div v-else style="padding: 10px">
+            <div v-if="!comments.length">
+              <h4 class="title is-4" style="margin-top: 25px; color: #95a5a6;">No comments</h4>
+            </div>
             <article class="media" v-for="comment in comments" v-bind:key="comment.id">
               <div class="media-content">
                 <div class="content">
@@ -158,7 +162,7 @@
             :onclick="`document.getElementById('close-tooltip-${id}').click()`"
             :id="`close-tooltip-${id}`"
             class="button is-primary hide-on-desktop"
-            style="width: 55%; margin-bottom: 10px;"
+            style="width: 55%; margin-bottom: 10px; margin-top: 20px;"
           >
             Close
           </button>
@@ -200,15 +204,18 @@ export default {
         const response = await this.$http.get(`https://www.reddit.com${permalink}.json`);
         const comments = _.get(response, 'body[1].data.children', []);
         const format = n => (n > 1000 ? '0.0a' : '0a');
-        this.comments = comments.slice(0, 3).map(({ data: comment }) => ({
-          id: comment.id,
-          author: comment.author,
-          body: he.decode(comment.body_html),
-          score: numeral(comment.score).format(format(comment.score)),
-          date: moment.utc(parseInt(`${comment.created_utc}000`, 10)).fromNow(),
-          isOP: comment.is_submitter,
-          isGilded: comment.gilded > 0,
-        }));
+        this.comments = comments
+          .map(({ data: comment }) => ({
+            id: comment.id,
+            author: comment.author,
+            body: comment.body_html ? he.decode(comment.body_html) : comment.body,
+            score: numeral(comment.score).format(format(comment.score)),
+            date: moment.utc(parseInt(`${comment.created_utc}000`, 10)).fromNow(),
+            isOP: comment.is_submitter,
+            isGilded: comment.gilded > 0,
+          }))
+          .filter(({ body }) => !_.includes(body, '<div class="md"><p>[removed]</p>'))
+          .slice(0, 3);
         this.areCommentsLoading = false;
       }
     },
