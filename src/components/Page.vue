@@ -34,7 +34,7 @@
           </li>
         </ul>
       </div>
-      <div v-if="isModifierLoad" style="position: absolute;left: 50%;top: 50%;-webkit-transform: translate(-50%, -50%);transform: translate(-50%, -50%);">
+      <div v-if="isModifierLoad" style="position: absolute;left: 50%;top: 70%;-webkit-transform: translate(-50%, -50%);transform: translate(-50%, -50%);">
         <rotate-loader></rotate-loader>
       </div>
       <div v-else>
