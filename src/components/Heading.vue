@@ -13,7 +13,9 @@
           <span v-else>An alternative <i class="fa fa-reddit-alien" aria-hidden="true"></i> client</span>
         </h2>
         <div class="field has-addons" style="justify-content: center;">
-          <div class="control"><a class="button is-static" style="width: 25px;">/r/</a></div>
+          <div class="control">
+            <a class="button is-static" v-bind:style="{ 'background-color': color, color: textColor, 'width': '72px' }">Go to /r/</a>
+          </div>
           <div class="control">
             <input
               @keyup="subredditSearchChange"
@@ -31,20 +33,25 @@
               <li
                 v-else
                 v-for="result in results"
-                v-bind:key="result"
-                @click="selectSubreddit(result)"
+                v-bind:key="result.name"
+                @click="openSubreddit(result)"
                 @mouseover="resultMouseover(result)"
                 v-bind:style="{
                   'background-color': isActive(result, results[0]) ? color : 'white',
-                  color: isActive(result, results[0]) ? textColor: '#363636'
+                  color: isActive(result, results[0]) ? textColor: '#363636',
+                  'text-overflow': 'ellipsis',
+                  'white-space': 'nowrap'
                 }"
+                :title="result.title"
+                v-tippy="{
+                  position: 'bottom-start',
+                  delay: [200, 0],
+                  size: 'small'
+                }">
               >
-                {{ result }}
+                {{ result.name }}
               </li>
             </ul>
-          </div>
-          <div class="control">
-            <a class="button" @click="openSubreddit()" v-bind:style="{ 'background-color': color, color: textColor }">Go</a>
           </div>
         </div>
       </div>
@@ -91,8 +98,8 @@ export default {
     };
   },
   methods: {
-    openSubreddit() {
-      const subreddit = this.$refs.subredditSearch.value;
+    openSubreddit(result) {
+      const subreddit = result ? result.name : this.$refs.subredditSearch.value;
       if (subreddit) {
         this.$router.push({ name: 'subreddit-page', params: { subreddit } });
       } else {
@@ -100,17 +107,12 @@ export default {
       }
     },
     isActive(result) {
-      return (this.mouseoveredResult === result);
+      return (this.mouseoveredResult.name === result.name);
     },
     resultMouseover(result) {
-      if (result !== '-1') {
+      if (result.name !== '-1') {
         this.mouseoveredResult = result;
       }
-    },
-    selectSubreddit(result) {
-      this.$refs.subredditSearch.value = result;
-      this.$refs.subredditSearch.focus();
-      this.hideResults();
     },
     hideResults() {
       this.isResultsShown = false;
@@ -123,16 +125,16 @@ export default {
     subredditSearchKeydown(results, event) {
       if (event.which === TAB_KEY) {
         event.preventDefault();
-        this.$refs.subredditSearch.value = this.mouseoveredResult;
+        this.$refs.subredditSearch.value = this.mouseoveredResult.name;
       }
 
       if (event.which === ENTER_KEY) {
         if (this.isResultsShown) {
-          if (_.toLower(this.$refs.subredditSearch.value) === _.toLower(this.mouseoveredResult)) {
-            this.$refs.subredditSearch.value = this.mouseoveredResult;
+          if (_.toLower(this.$refs.subredditSearch.value) === _.toLower(this.mouseoveredResult.name)) {
+            this.$refs.subredditSearch.value = this.mouseoveredResult.name;
             this.openSubreddit();
           } else {
-            this.$refs.subredditSearch.value = this.mouseoveredResult;
+            this.$refs.subredditSearch.value = this.mouseoveredResult.name;
             this.hideResults();
           }
         } else {
@@ -143,13 +145,19 @@ export default {
       if (event.which === DOWN_ARROW) {
         event.preventDefault();
         this.mouseoveredResult =
-          results[mod(results.indexOf(this.mouseoveredResult) + 1, results.length)];
+          results[mod(
+            _.findIndex(results, result => result.name === this.mouseoveredResult.name) + 1,
+            results.length,
+          )];
       }
 
       if (event.which === UP_ARROW) {
         event.preventDefault();
         this.mouseoveredResult =
-          results[mod(results.indexOf(this.mouseoveredResult) - 1, results.length)];
+          results[mod(
+            _.findIndex(results, result => result.name === this.mouseoveredResult.name) - 1,
+            results.length,
+          )];
       }
     },
     subredditSearchChange: _.debounce(/* eslint-disable func-names */async function (event) {
@@ -170,13 +178,12 @@ export default {
         .map(({ data }) => ({
           name: data.display_name,
           subscribers: data.subscribers,
-          title: data.title,
+          title: data.public_description || data.title,
         }))
-        .filter(({ subscribers }) => subscribers !== null)
-        .map(({ name }) => name);
+        .filter(({ subscribers }) => subscribers !== null);
 
       if (_.isEmpty(results)) {
-        this.results = ['-1'];
+        this.results = [{ name: '-1' }];
         return;
       }
 
