@@ -1,7 +1,7 @@
 <template>
   <div class="card post">
     <header class="card-header" v-bind:style="{ 'background-color': color }">
-      <p class="card-header-title no-wrap" v-bind:style="{ 'color': textColor }">
+      <p class="card-header-title no-wrap" v-bind:style="{ 'color': textColor, overflow: 'auto' }">
         <router-link :to="`/${subreddit}`">{{ subreddit }}</router-link>
         &nbsp;&middot;
         {{ date }}
@@ -9,7 +9,7 @@
         <a :href="clickUrl" target="_blank">{{ domain }}</a>
       </p>
     </header>
-    <div class="card-content">
+    <div class="card-content" style="overflow-x: auto;">
       <div class="content">
         <div v-if="type !== postType.OTHER">
           <p class="title">
@@ -58,7 +58,7 @@
         <div v-if="type === postType.IMAGE || type === postType.GIF">
           <a target="_blank" :href="clickUrl"><img class="center full-width" :src="url"></img></a>
         </div>
-        <div v-if="type === postType.SELF && details" style="overflow-x: auto;">
+        <div v-if="type === postType.SELF && details">
           <p class="text-content"><vue-markdown>{{ details }}</vue-markdown></p>
         </div>
         <div v-if="type === postType.YOUTUBE">

@@ -4,11 +4,25 @@
       'background-image': `-webkit-linear-gradient(left, ${color}, rgba(0,0,0,0))${bannerImg ? `, url(${bannerImg})` : ''}`,
       'background-size': `auto, cover`,
     }">
+      <div v-if="subreddit" style="position: absolute; top: 10px; left: 10px;">
+        <router-link to="/" class="button" v-bind:style="{
+          background: 'transparent',
+          color: textColor,
+          'border-color': textColor
+        }">
+          Re&nbsp;<i class="fa fa-reddit-alien" aria-hidden="true"></i>
+        </router-link>
+      </div>
       <div class="container">
-        <h1 class="title" v-bind:style="{ color: textColor }">
+        <h1 class="title" v-bind:style="{ color: textColor, display: 'flex', 'justify-content': 'center' }">
           {{ subreddit || 'Rereddit' }}
         </h1>
-        <h2 class="subtitle" v-bind:style="{ color: textColor }">
+        <h2 class="subtitle" v-bind:style="{
+          color: textColor,
+          display: 'flex',
+          'justify-content': 'center',
+          'text-align': 'center'
+        }">
           <span v-if="title">{{ title }}</span>
           <span v-else>An alternative <i class="fa fa-reddit-alien" aria-hidden="true"></i> client</span>
         </h2>
@@ -55,7 +69,7 @@
           </div>
         </div>
       </div>
-      <div v-if="onlineUsers && totalUsers" class="field is-grouped is-grouped-multiline" style="position: absolute; right: 10px; top: 183px;">
+      <div v-if="onlineUsers && totalUsers" class="field is-grouped is-grouped-multiline" style="position: relative;bottom: -37px;float: right;right: -8px;">
         <div class="control">
           <div class="tags has-addons">
             <span class="tag">{{ onlineUsers }}</span>
@@ -74,13 +88,6 @@
       </div>
     </div>
   </section>
-  <!-- <nav class="navbar" role="navigation" aria-label="main navigation">
-    <div class="navbar-menu">
-      <a class="navbar-item">
-        Home
-      </a>
-    </div>
-  </nav> -->
 </template>
 
 <script>
