@@ -29,7 +29,7 @@
               style="padding-left: 3px;"
             >
             <ul class="options-list" v-bind:style="{ opacity: isResultsShown ? 100 : 0 }">
-              <li v-if="results.length === 1 && results[0] === '-1'">Nothing found.</li>
+              <li v-if="results.length === 1 && results[0].name === '-1'">Nothing found.</li>
               <li
                 v-else
                 v-for="result in results"
@@ -47,7 +47,7 @@
                   position: 'bottom-start',
                   delay: [200, 0],
                   size: 'small'
-                }">
+                }"
               >
                 {{ result.name }}
               </li>
@@ -149,13 +149,8 @@ export default {
 
       if (event.which === ENTER_KEY) {
         if (this.isResultsShown) {
-          if (_.toLower(this.$refs.subredditSearch.value) === _.toLower(this.mouseoveredResult.name)) {
-            this.$refs.subredditSearch.value = this.mouseoveredResult.name;
-            this.openSubreddit();
-          } else {
-            this.$refs.subredditSearch.value = this.mouseoveredResult.name;
-            this.hideResults();
-          }
+          this.$refs.subredditSearch.value = this.mouseoveredResult.name;
+          this.openSubreddit();
         } else {
           this.openSubreddit();
         }
