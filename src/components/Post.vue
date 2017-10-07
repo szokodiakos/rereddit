@@ -105,22 +105,12 @@
               style="max-width: 100%"
             ></iframe>
         </div>
-        <!-- <div v-if="type === postType.VREDDIT">
-        </div> -->
         <br v-if="type !== postType.OTHER" class="hide-on-desktop">
       </div>
     </div>
     <footer class="card-footer">
-      <label class="card-footer-item" style="text-transform: uppercase; color: #2ecc71;">
-        <!-- <a href="#" class="card-footer-item">
-          <b-icon pack="fa" icon="arrow-up"></b-icon>
-        </a>
-        <label class="card-footer-item" style="text-transform: uppercase;"> -->
+      <label class="card-footer-item" style="color: #2ecc71;">
           <b-icon style="margin-right: 8px;" pack="fa" icon="arrow-up"></b-icon> {{ score }}
-        <!-- </label>
-        <a href="#" class="card-footer-item">
-          <b-icon pack="fa" icon="arrow-down"></b-icon>
-        </a> -->
       </label>
       <a @mouseover="loadTopComments(permalink)" ref="tippy" v-tippy="{
         theme: 'light',
@@ -129,7 +119,7 @@
         size: 'small',
         sticky: true,
         delay: [300, 100]
-      }" class="card-footer-item" style="text-transform: uppercase;" :data-html="`#tooltip-content-${id}`">
+      }" class="card-footer-item" :data-html="`#tooltip-content-${id}`">
         <div :id="`tooltip-content-${id}`" style="display:none">
           <strong>
             <b-icon pack="fa" icon="trophy" size="is-small" style="margin-bottom: 4px;"></b-icon> Top Comments
@@ -149,7 +139,7 @@
                   {{ comment.date }}
                   &middot;
                   <b-icon pack="fa" icon="arrow-up" size="is-small" style="margin-bottom: 4px; color: #2ecc71"></b-icon>
-                  <span style="color: #2ecc71; text-transform: uppercase;">{{ comment.score }}</span>
+                  <span style="color: #2ecc71;">{{ comment.score }}</span>
                   <b-icon v-if="comment.isGilded" pack="fa" icon="star" size="is-small" style="margin-bottom: 3px; color: #FFD700"></b-icon>
                   <strong v-if="comment.isOP" style="color: #3498db; text-transform: uppercase;">op</strong>
                   <br>
