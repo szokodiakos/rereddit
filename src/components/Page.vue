@@ -68,7 +68,6 @@
           style="height: 100px; margin-top:50px"
           v-if="lastPostId"
           @infinite="infiniteHandler"
-          v-bind:distance="2000"
         >
           <span slot="spinner">
             <rotate-loader></rotate-loader>
