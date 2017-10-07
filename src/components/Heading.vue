@@ -55,6 +55,23 @@
           </div>
         </div>
       </div>
+      <div v-if="onlineUsers && totalUsers" class="field is-grouped is-grouped-multiline" style="position: absolute; right: 10px; top: 183px;">
+        <div class="control">
+          <div class="tags has-addons">
+            <span class="tag">{{ onlineUsers }}</span>
+            <span class="tag" style="background-color: #2ecc71; color: white;">online</span>
+          </div>
+        </div>
+        <div class="control">
+          <div class="tags has-addons">
+            <span class="tag">{{ totalUsers }}</span>
+            <span class="tag" v-bind:style="{
+              'background-color': color,
+              color: textColor
+            }">total</span>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
   <!-- <nav class="navbar" role="navigation" aria-label="main navigation">
@@ -87,6 +104,8 @@ export default {
     'textColor',
     'subreddit',
     'title',
+    'onlineUsers',
+    'totalUsers',
   ],
   data() {
     return {

@@ -179,12 +179,12 @@
 
 <script>
 import postType from '@/enums/postType';
+import utils from '@/utils';
 import VueMarkdown from 'vue-markdown';
 import RotateLoader from 'vue-spinner/src/RotateLoader';
 import _ from 'lodash';
 import he from 'he';
 import moment from 'moment';
-import numeral from 'numeral';
 
 export default {
   name: 'post',
@@ -204,13 +204,12 @@ export default {
         this.areCommentsLoading = true;
         const response = await this.$http.get(`https://www.reddit.com${permalink}.json`);
         const comments = _.get(response, 'body[1].data.children', []);
-        const format = n => (n > 1000 ? '0.0a' : '0a');
         this.comments = comments
           .map(({ data: comment }) => ({
             id: comment.id,
             author: comment.author,
             body: comment.body_html ? he.decode(comment.body_html) : comment.body,
-            score: numeral(comment.score).format(format(comment.score)),
+            score: utils.formatNumber(comment.score),
             date: moment.utc(parseInt(`${comment.created_utc}000`, 10)).fromNow(),
             isOP: comment.is_submitter,
             isGilded: comment.gilded > 0,

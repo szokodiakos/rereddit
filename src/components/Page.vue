@@ -10,6 +10,8 @@
         :text-color="subredditData.textColor"
         :subreddit="subreddit"
         :title="subredditData.title"
+        :online-users="subredditData.onlineUsers"
+        :total-users="subredditData.totalUsers"
       ></Heading>
       <a class="button is-large" @click="jumpToTop" v-bind:style="{
         'z-index': 10,
@@ -64,7 +66,6 @@
 
 <script>
 import moment from 'moment';
-import numeral from 'numeral';
 import _ from 'lodash';
 import InfiniteLoading from 'vue-infinite-loading';
 import RotateLoader from 'vue-spinner/src/RotateLoader';
@@ -73,6 +74,7 @@ import he from 'he';
 import Post from '@/components/Post';
 import Heading from '@/components/Heading';
 import postType from '@/enums/postType';
+import utils from '@/utils';
 
 function getRGBComponents(color) {
   const r = color.substring(1, 3);
@@ -201,8 +203,8 @@ export default {
         const subredditData = subredditResponse.body.data;
         this.subredditData = {
           title: subredditData.title,
-          onlineUsers: subredditData.accounts_active,
-          totalUsers: subredditData.accounts_active,
+          onlineUsers: utils.formatNumber(subredditData.accounts_active),
+          totalUsers: utils.formatNumber(subredditData.subscribers),
           headerImg: subredditData.header_img,
           bannerImg: subredditData.banner_img,
           iconImg: subredditData.icon_img,
@@ -221,9 +223,8 @@ export default {
       const posts = response.body.data.children.map(({ data: post }) => {
         const id = post.id;
         const title = he.decode(post.title);
-        const format = n => (n > 1000 ? '0.0a' : '0a');
-        const score = numeral(post.score).format(format(post.score));
-        const commentCount = numeral(post.num_comments).format(format(post.num_comments));
+        const score = utils.formatNumber(post.score);
+        const commentCount = utils.formatNumber(post.num_comments);
         const subredditName = post.subreddit_name_prefixed;
         const author = post.author;
         const date = moment.utc(parseInt(`${post.created_utc}000`, 10)).fromNow();
