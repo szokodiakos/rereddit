@@ -117,8 +117,8 @@ function getStreamableId(url) {
 function getGfycatId(url) {
   const regExp = /^.*gfycat\.com\/(.*)/;
   const match = url.match(regExp);
-  if (match && match[1]) {
-    return match[1];
+  if (match) {
+    return _.last(url.split('/'));
   }
   return undefined;
 }
