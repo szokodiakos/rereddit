@@ -231,7 +231,7 @@ export default {
         const thumbnail = (!post.thumbnail || post.thumbnail === 'default') ? 'static/reddit.jpeg' : post.thumbnail;
         const permalink = post.permalink;
         const isSticky = post.stickied;
-        const tag = post.link_flair_text;
+        const tag = he.decode(post.link_flair_text || '');
         let url = post.url;
         let clickUrl;
         let detailsPromise = Promise.resolve();

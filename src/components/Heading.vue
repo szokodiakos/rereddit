@@ -20,30 +20,28 @@
               @keydown="subredditSearchKeydown(results, $event)"
               @focus="stopTyped();showResults();"
               @click="showResults();"
-              @blur="startTyped();"
+              @blur="startTyped();hideResults();"
               ref="subredditSearch"
               class="input go-to-subreddit"
               type="text"
               style="padding-left: 3px;"
             >
-            <div v-show="isResultsShown">
-              <ul class="options-list">
-                <li v-if="results.length === 1 && results[0] === '-1'">Nothing found.</li>
-                <li
-                  v-else
-                  v-for="result in results"
-                  v-bind:key="result"
-                  @click="selectSubreddit(result)"
-                  @mouseover="resultMouseover(result)"
-                  v-bind:style="{
-                    'background-color': isActive(result, results[0]) ? color : 'white',
-                    color: isActive(result, results[0]) ? textColor: '#363636'
-                  }"
-                >
-                  {{ result }}
-                </li>
-              </ul>
-            </div>
+            <ul class="options-list" v-bind:style="{ opacity: isResultsShown ? 100 : 0 }">
+              <li v-if="results.length === 1 && results[0] === '-1'">Nothing found.</li>
+              <li
+                v-else
+                v-for="result in results"
+                v-bind:key="result"
+                @click="selectSubreddit(result)"
+                @mouseover="resultMouseover(result)"
+                v-bind:style="{
+                  'background-color': isActive(result, results[0]) ? color : 'white',
+                  color: isActive(result, results[0]) ? textColor: '#363636'
+                }"
+              >
+                {{ result }}
+              </li>
+            </ul>
           </div>
           <div class="control">
             <a class="button" @click="openSubreddit()" v-bind:style="{ 'background-color': color, color: textColor }">Go</a>
@@ -130,7 +128,8 @@ export default {
 
       if (event.which === ENTER_KEY) {
         if (this.isResultsShown) {
-          if (this.$refs.subredditSearch.value === this.mouseoveredResult) {
+          if (_.toLower(this.$refs.subredditSearch.value) === _.toLower(this.mouseoveredResult)) {
+            this.$refs.subredditSearch.value = this.mouseoveredResult;
             this.openSubreddit();
           } else {
             this.$refs.subredditSearch.value = this.mouseoveredResult;
