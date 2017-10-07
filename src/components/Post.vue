@@ -141,6 +141,7 @@
                   <b-icon pack="fa" icon="arrow-up" size="is-small" style="margin-bottom: 4px; color: #2ecc71"></b-icon>
                   <span style="color: #2ecc71;">{{ comment.score }}</span>
                   <b-icon v-if="comment.isGilded" pack="fa" icon="star" size="is-small" style="margin-bottom: 3px; color: #FFD700"></b-icon>
+                  <b-icon v-if="comment.isSticky" pack="fa" icon="thumb-tack" class="fa-rotate-270" size="is-small" style="margin-bottom: 3px; color: #e74c3c;"></b-icon>
                   <strong v-if="comment.isOP" style="color: #3498db; text-transform: uppercase;">op</strong>
                   <br>
                   <span v-html="comment.body"></span>
@@ -194,6 +195,7 @@ export default {
         this.areCommentsLoading = true;
         const response = await this.$http.get(`https://www.reddit.com${permalink}.json`);
         const comments = _.get(response, 'body[1].data.children', []);
+        console.log(comments);
         this.comments = comments
           .map(({ data: comment }) => ({
             id: comment.id,
@@ -203,6 +205,7 @@ export default {
             date: moment.utc(parseInt(`${comment.created_utc}000`, 10)).fromNow(),
             isOP: comment.is_submitter,
             isGilded: comment.gilded > 0,
+            isSticky: comment.stickied,
           }))
           .filter(({ body }) => !_.includes(body, '<div class="md"><p>[removed]</p>'))
           .slice(0, 3);
