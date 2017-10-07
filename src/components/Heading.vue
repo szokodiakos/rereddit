@@ -130,8 +130,12 @@ export default {
 
       if (event.which === ENTER_KEY) {
         if (this.isResultsShown) {
-          this.$refs.subredditSearch.value = this.mouseoveredResult;
-          this.hideResults();
+          if (this.$refs.subredditSearch.value === this.mouseoveredResult) {
+            this.openSubreddit();
+          } else {
+            this.$refs.subredditSearch.value = this.mouseoveredResult;
+            this.hideResults();
+          }
         } else {
           this.openSubreddit();
         }
