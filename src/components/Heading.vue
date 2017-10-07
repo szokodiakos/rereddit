@@ -219,14 +219,16 @@ export default {
       this.typed = null;
     },
     startTyped() {
-      this.typed = new Typed('.go-to-subreddit', {
-        strings: this.subreddits,
-        attr: 'placeholder',
-        typeSpeed: 40,
-        backSpeed: 40,
-        shuffle: true,
-        loop: true,
-      });
+      if (!this.typed) {
+        this.typed = new Typed('.go-to-subreddit', {
+          strings: this.subreddits,
+          attr: 'placeholder',
+          typeSpeed: 40,
+          backSpeed: 40,
+          shuffle: true,
+          loop: true,
+        });
+      }
     },
   },
   async mounted() {
