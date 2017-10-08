@@ -34,6 +34,24 @@
           </li>
         </ul>
       </div>
+
+      <div v-if="modifier === 'controversial' || modifier === 'top'" style="display:flex; justify-content: center">
+        <span style="padding-top: 6px; padding-right: 6px;">Show posts from</span>
+        <b-dropdown>
+          <button class="button is-primary is-outlined" slot="trigger">
+              <span>{{ selectedFrom.label }} <i class="fa fa-angle-down"></i></span>
+          </button>
+          <b-dropdown-item
+            v-if="fromOption.query !== selectedFrom.query"
+            v-for="fromOption in fromOptions"
+            v-bind:key="fromOption.query"
+            @click="changeFrom(fromOption)"
+          >
+            {{ fromOption.label }}</router-link>
+          </b-dropdown-item>
+        </b-dropdown>
+      </div>
+
       <div v-if="isPostsLoading" style="position: absolute;left: 50%;top: 70%;-webkit-transform: translate(-50%, -50%);transform: translate(-50%, -50%);">
         <rotate-loader></rotate-loader>
       </div>
@@ -160,6 +178,7 @@ export default {
   name: 'app',
   async created() {
     this.setTitle();
+    this.selectedFrom = this.getSelectedFrom();
     this.subredditData = await this.getSubredditData();
     this.posts = await this.getPosts();
     this.isPageLoading = false;
@@ -177,6 +196,7 @@ export default {
       }
 
       this.posts = [];
+      this.selectedFrom = this.getSelectedFrom();
       this.posts = await this.getPosts();
       this.isPostsLoading = false;
     },
@@ -185,10 +205,28 @@ export default {
     subreddit() {
       return this.$route.params.subreddit ? `/r/${this.$route.params.subreddit}` : '';
     },
+    modifier() {
+      return this.$route.params.modifier;
+    },
+    show() {
+      return this.$route.query.show;
+    },
   },
   methods: {
+    changeFrom(fromOption) {
+      this.$router.push({
+        query: { show: fromOption.query },
+      });
+    },
+    getSelectedFrom() {
+      const fromOption = this.fromOptions.find(f => f.query === this.show);
+      if (!fromOption) {
+        return this.fromOptions[0];
+      }
+      return fromOption;
+    },
     getRouteLink(tab) {
-      const currentModifier = this.$route.params.modifier || '';
+      const currentModifier = this.modifier || '';
       const tabModifier = tab.modifier || '';
 
       if (currentModifier === tabModifier) {
@@ -212,7 +250,7 @@ export default {
       return this.$route.path.replace(currentModifier, tabModifier);
     },
     isActiveTab(tab) {
-      return tab.modifier === this.$route.params.modifier;
+      return tab.modifier === this.modifier;
     },
     setTitle() {
       if (this.subreddit) {
@@ -272,8 +310,15 @@ export default {
       return subredditData;
     },
     async getPosts({ after } = {}) {
-      const modifier = this.$route.params.modifier;
-      let requestUrl = `https://www.reddit.com/${this.subreddit}${modifier ? `/${modifier}` : ''}.json?limit=10`;
+      const modifier = this.modifier ?
+        `/${this.modifier}` :
+        '';
+
+      const show = ((this.modifier === 'controversial' || this.modifier === 'top') && this.show) ?
+        `&sort=${this.modifier}&t=${this.show}` :
+        '';
+
+      let requestUrl = `https://www.reddit.com/${this.subreddit}${modifier}.json?limit=10${show}`;
       if (after) {
         requestUrl += `&after=t3_${after}`;
       }
@@ -400,6 +445,23 @@ export default {
       subredditData: DEFAULT_SUBREDDIT_DATA,
       postType,
       lastPostId: '',
+      selectedFrom: null,
+      fromOptions: [{
+        query: 'day',
+        label: 'past 24 hours',
+      }, {
+        query: 'hour',
+        label: 'past hour',
+      }, {
+        query: 'week',
+        label: 'past week',
+      }, {
+        query: 'year',
+        label: 'past year',
+      }, {
+        query: 'all',
+        label: 'all time',
+      }],
     };
   },
   components: {
