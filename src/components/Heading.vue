@@ -9,7 +9,7 @@
           background: 'transparent',
           color: textColor,
           'border-color': textColor
-        }">
+        }" v-tippy="{ position: 'right' }" title="Go to Front Page">
           Re&nbsp;<i class="fa fa-reddit-alien" aria-hidden="true"></i>
         </router-link>
       </div>

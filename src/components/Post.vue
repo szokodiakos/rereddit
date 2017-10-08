@@ -195,7 +195,6 @@ export default {
         this.areCommentsLoading = true;
         const response = await this.$http.get(`https://www.reddit.com${permalink}.json`);
         const comments = _.get(response, 'body[1].data.children', []);
-        console.log(comments);
         this.comments = comments
           .map(({ data: comment }) => ({
             id: comment.id,
