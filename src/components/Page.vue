@@ -7,6 +7,7 @@
       <Heading
         :color="subredditData.color"
         :banner-img="subredditData.bannerImg"
+        :header-img="subredditData.headerImg"
         :text-color="subredditData.textColor"
         :subreddit="subreddit"
         :title="subredditData.title"

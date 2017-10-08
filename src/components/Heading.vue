@@ -13,6 +13,9 @@
           Re&nbsp;<i class="fa fa-reddit-alien" aria-hidden="true"></i>
         </router-link>
       </div>
+      <div v-if="headerImg" style="text-align: center;">
+        <img :src="headerImg">
+      </div>
       <div class="container">
         <h1 class="title" v-bind:style="{ color: textColor, display: 'flex', 'justify-content': 'center' }">
           {{ subreddit || 'Rereddit' }}
@@ -108,6 +111,7 @@ export default {
   props: [
     'color',
     'bannerImg',
+    'headerImg',
     'textColor',
     'subreddit',
     'title',
