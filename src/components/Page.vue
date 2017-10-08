@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="isInitialLoad" style="position: absolute;left: 50%;top: 50%;-webkit-transform: translate(-50%, -50%);transform: translate(-50%, -50%);">
+    <div v-if="isPageLoading" style="position: absolute;left: 50%;top: 50%;-webkit-transform: translate(-50%, -50%);transform: translate(-50%, -50%);">
       <rotate-loader></rotate-loader>
     </div>
     <div v-else>
@@ -34,7 +34,7 @@
           </li>
         </ul>
       </div>
-      <div v-if="isModifierLoad" style="position: absolute;left: 50%;top: 70%;-webkit-transform: translate(-50%, -50%);transform: translate(-50%, -50%);">
+      <div v-if="isPostsLoading" style="position: absolute;left: 50%;top: 70%;-webkit-transform: translate(-50%, -50%);transform: translate(-50%, -50%);">
         <rotate-loader></rotate-loader>
       </div>
       <div v-else>
@@ -159,21 +159,25 @@ export default {
   name: 'app',
   async created() {
     this.setTitle();
+    this.subredditData = await this.getSubredditData();
     this.posts = await this.getPosts();
-    this.isInitialLoad = false;
+    this.isPageLoading = false;
   },
   watch: {
     async $route(to, from) {
-      if (to.params.subreddit === from.params.subreddit) {
-        this.isModifierLoad = true;
-      } else {
-        this.isInitialLoad = true;
+      this.isPostsLoading = true;
+
+      const isNewSubredditNavigaition = to.params.subreddit !== from.params.subreddit;
+      if (isNewSubredditNavigaition) {
+        this.isPageLoading = true;
         this.setTitle();
+        this.subredditData = await this.getSubredditData();
+        this.isPageLoading = false;
       }
+
       this.posts = [];
       this.posts = await this.getPosts();
-      this.isInitialLoad = false;
-      this.isModifierLoad = false;
+      this.isPostsLoading = false;
     },
   },
   computed: {
@@ -209,9 +213,9 @@ export default {
     isActiveTab(tab) {
       return tab.path === this.$route.params.modifier;
     },
-    setTitle(subreddit) {
-      if (subreddit) {
-        document.title = `${subreddit} - Rereddit`;
+    setTitle() {
+      if (this.subreddit) {
+        document.title = `${this.subreddit} - Rereddit`;
       } else {
         document.title = 'Rereddit - alternative Reddit client';
       }
@@ -246,24 +250,27 @@ export default {
         };
       }));
     },
-    async getPosts({ after } = {}) {
+    async getSubredditData() {
+      let subredditData;
       if (this.subreddit) {
         const subredditResponse = await this.$http.get(`https://www.reddit.com/${this.subreddit}/about.json`);
-        const subredditData = subredditResponse.body.data;
-        this.subredditData = {
-          title: subredditData.title,
-          onlineUsers: utils.formatNumber(subredditData.accounts_active),
-          totalUsers: utils.formatNumber(subredditData.subscribers),
-          headerImg: subredditData.header_img,
-          bannerImg: subredditData.banner_img,
-          iconImg: subredditData.icon_img,
-          color: subredditData.key_color || DEFAULT_COLOR,
+        const subredditDataRaw = subredditResponse.body.data;
+        subredditData = {
+          title: subredditDataRaw.title,
+          onlineUsers: utils.formatNumber(subredditDataRaw.accounts_active),
+          totalUsers: utils.formatNumber(subredditDataRaw.subscribers),
+          headerImg: subredditDataRaw.header_img,
+          bannerImg: subredditDataRaw.banner_img,
+          iconImg: subredditDataRaw.icon_img,
+          color: subredditDataRaw.key_color || DEFAULT_COLOR,
         };
-        this.subredditData.textColor = getTextColor(this.subredditData.color);
+        subredditData.textColor = getTextColor(this.subredditData.color);
       } else {
-        this.subredditData = DEFAULT_SUBREDDIT_DATA;
+        subredditData = DEFAULT_SUBREDDIT_DATA;
       }
-
+      return subredditData;
+    },
+    async getPosts({ after } = {}) {
       const modifier = this.$route.params.modifier;
       let requestUrl = `https://www.reddit.com/${this.subreddit}${modifier ? `/${modifier}` : ''}.json?limit=10`;
       if (after) {
@@ -383,8 +390,8 @@ export default {
         icon: 'trophy',
         path: 'top',
       }],
-      isInitialLoad: true,
-      isModifierLoad: false,
+      isPageLoading: true,
+      isPostsLoading: false,
       colors: {},
       posts: [],
       subredditData: DEFAULT_SUBREDDIT_DATA,
