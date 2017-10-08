@@ -161,9 +161,6 @@
         </div>
         <b-icon style="margin-right: 8px;" pack="fa" icon="comments-o"></b-icon>{{ commentCount }}
       </a>
-      <!-- <a href="#" class="card-footer-item">
-        <b-icon size="is-medium" style="margin-right: 8px;" pack="fa" icon="share"></b-icon>
-      </a> -->
     </footer>
   </div>
 </template>

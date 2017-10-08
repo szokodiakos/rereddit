@@ -188,7 +188,7 @@ export default {
   methods: {
     getRouteLink(tab) {
       const currentModifier = this.$route.params.modifier || '';
-      const tabModifier = tab.path || '';
+      const tabModifier = tab.modifier || '';
 
       if (currentModifier === tabModifier) {
         return this.$route.path;
@@ -211,7 +211,7 @@ export default {
       return this.$route.path.replace(currentModifier, tabModifier);
     },
     isActiveTab(tab) {
-      return tab.path === this.$route.params.modifier;
+      return tab.modifier === this.$route.params.modifier;
     },
     setTitle() {
       if (this.subreddit) {
@@ -372,23 +372,23 @@ export default {
       tabs: [{
         name: 'Hot',
         icon: 'fire',
-        path: undefined,
+        modifier: undefined,
       }, {
         name: 'New',
         icon: 'bolt',
-        path: 'new',
+        modifier: 'new',
       }, {
         name: 'Rising',
         icon: 'line-chart',
-        path: 'rising',
+        modifier: 'rising',
       }, {
         name: 'Controversial',
         icon: 'compress',
-        path: 'controversial',
+        modifier: 'controversial',
       }, {
         name: 'Top',
         icon: 'trophy',
-        path: 'top',
+        modifier: 'top',
       }],
       isPageLoading: true,
       isPostsLoading: false,
