@@ -42,7 +42,7 @@
               type="text"
               style="padding-left: 3px;"
             >
-            <ul class="options-list" v-bind:style="{ opacity: isResultsShown ? 100 : 0 }">
+            <ul class="options-list" @mousedown="prevent" v-show="isResultsShown">
               <li v-if="results.length === 1 && results[0].name === '-1'">Nothing found.</li>
               <li
                 v-else
@@ -139,6 +139,9 @@ export default {
       if (result.name !== '-1') {
         this.mouseoveredResult = result;
       }
+    },
+    prevent(e) {
+      e.preventDefault();
     },
     hideResults() {
       this.isResultsShown = false;
