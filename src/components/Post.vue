@@ -12,7 +12,7 @@
     <div class="card-content" style="overflow-x: auto;">
       <div class="content">
         <div v-if="type !== postType.OTHER">
-          <p class="title">
+          <p class="title post-title">
             <a :href="clickUrl" target="_blank">
               <b-icon
                 v-if="isSticky"
@@ -25,6 +25,7 @@
               {{ title }}
             </a>
             <span v-if="tag" class="tag">{{ tag }}</span>
+            <span v-if="isNsfw" class="tag" style="background-color: #e74c3c; color: white">nsfw</span>
           </p>
         </div>
         <div v-if="type === postType.OTHER">
@@ -38,7 +39,11 @@
             </figure>
             <div class="media-content">
               <a :href="clickUrl" target="_blank">
-                <p class="title">{{ title }} <span v-if="tag" class="tag">{{ tag }}</span></p>
+                <p class="title post-title">
+                  {{ title }}&nbsp;
+                  <span v-if="tag" class="tag">{{ tag }}</span>
+                  <span v-if="isNsfw" class="tag" style="background-color: #e74c3c; color: white">nsfw</span>
+                </p>
               </a>
               <p class="image width-128 hide-on-desktop center" style="margin-top: 10px;">
                 <a :href="clickUrl" target="_blank">
@@ -102,7 +107,7 @@
               width="640"
               height="360"
               allowfullscreen
-              style="max-width: 100%"
+              style="max-width: 100%;display: flex;justify-content: center;"
             ></iframe>
         </div>
         <br v-if="type !== postType.OTHER" class="hide-on-desktop">
@@ -233,12 +238,27 @@ export default {
     'permalink',
     'author',
     'tag',
+    'isNsfw',
   ],
 };
 </script>
 
 <style>
 @media screen and (max-width: 768px) {
+  .post-title {
+    padding: 0.7rem !important;
+    line-height: 1;
+  }
+
+  .post-title a {
+    font-size: 1.6rem;
+  }
+
+  .card-header-title {
+    padding: 0.4rem;
+    font-size: 0.8rem;
+  }
+
   .post {
     width: 100%;
     margin: 25px auto;

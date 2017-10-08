@@ -63,6 +63,7 @@
           :comment-count="post.commentCount"
           :permalink="post.permalink"
           :tag="post.tag"
+          :is-nsfw="post.isNsfw"
         ></Post>
         <infinite-loading
           style="height: 100px; margin-top:50px"
@@ -289,6 +290,7 @@ export default {
         const thumbnail = (!post.thumbnail || post.thumbnail === 'default') ? 'static/reddit.jpeg' : post.thumbnail;
         const permalink = post.permalink;
         const isSticky = post.stickied;
+        const isNsfw = post.over_18;
         const tag = he.decode(post.link_flair_text || '');
         let url = post.url;
         let clickUrl;
@@ -352,6 +354,7 @@ export default {
           permalink,
           clickUrl,
           tag,
+          isNsfw,
         };
       });
       const populatedPosts = await this.populatePostDetails(posts);
