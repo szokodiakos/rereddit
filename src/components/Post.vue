@@ -11,7 +11,7 @@
     </header>
     <div class="card-content" style="overflow-x: auto;">
       <div class="content">
-        <div v-if="type !== postType.OTHER">
+        <div v-if="type !== postTypes.OTHER">
           <p class="title post-title">
             <a :href="clickUrl" target="_blank">
               <b-icon
@@ -54,19 +54,19 @@
             </div>
           </article>
         </div>
-        <br v-if="type !== postType.OTHER" class="hide-on-mobile">
-        <div v-if="type === postType.VIDEO">
+        <br v-if="type !== postTypes.OTHER" class="hide-on-mobile">
+        <div v-if="type === postTypes.VIDEO">
           <video class="center full-width" preload="auto" autoplay="autoplay" muted="muted" loop="loop" webkit-playsinline="" playsinline>
             <source :src="url" type="video/mp4"></source>
           </video>
         </div>
-        <div v-if="type === postType.IMAGE || type === postType.GIF">
+        <div v-if="type === postTypes.IMAGE || type === postTypes.GIF">
           <a target="_blank" :href="clickUrl"><img class="center full-width" :src="url"></img></a>
         </div>
-        <div v-if="type === postType.SELF && details">
+        <div v-if="type === postTypes.SELF && details">
           <p class="text-content"><vue-markdown>{{ details }}</vue-markdown></p>
         </div>
-        <div v-if="type === postType.YOUTUBE">
+        <div v-if="type === postTypes.YOUTUBE">
           <iframe
             class="center full-width"
             width="640"
@@ -76,7 +76,7 @@
             allowfullscreen
           ></iframe>
         </div>
-        <div v-if="type === postType.TWITCH">
+        <div v-if="type === postTypes.TWITCH">
           <iframe
             class="center full-width"
             :src="`https://clips.twitch.tv/embed?clip=${mediaId}&autoplay=false&tt_medium=clips_embed`"
@@ -87,7 +87,7 @@
             allowfullscreen="true"
           ></iframe>
         </div>
-        <div v-if="type === postType.GFYCAT">
+        <div v-if="type === postTypes.GFYCAT">
           <div style="position:relative;padding-bottom:57%" class="full-width">
             <iframe
               :src="`https://gfycat.com/ifr/${mediaId}`"
@@ -100,7 +100,7 @@
             ></iframe>
           </div>
         </div>
-        <div v-if="type === postType.STREAMABLE" class="full-width">
+        <div v-if="type === postTypes.STREAMABLE" class="full-width">
             <iframe
               :src="`https://streamable.com/s/${mediaId}`"
               frameborder="0"
@@ -110,7 +110,7 @@
               style="max-width: 100%;display: flex;justify-content: center;"
             ></iframe>
         </div>
-        <br v-if="type !== postType.OTHER" class="hide-on-desktop">
+        <br v-if="type !== postTypes.OTHER" class="hide-on-desktop">
       </div>
     </div>
     <footer class="card-footer">
@@ -178,8 +178,8 @@
 </template>
 
 <script>
-import postType from '@/enums/postType';
-import utils from '@/utils';
+import postTypes from '@/enums/postTypes';
+import common from '@/common';
 import VueMarkdown from 'vue-markdown';
 import RotateLoader from 'vue-spinner/src/RotateLoader';
 import _ from 'lodash';
@@ -190,7 +190,7 @@ export default {
   name: 'post',
   data() {
     return {
-      postType,
+      postTypes,
       areCommentsLoading: false,
       comments: [],
     };
@@ -209,7 +209,7 @@ export default {
             id: comment.id,
             author: comment.author,
             body: comment.body_html ? he.decode(comment.body_html) : comment.body,
-            score: utils.formatNumber(comment.score),
+            score: common.formatNumber(comment.score),
             date: moment.utc(parseInt(`${comment.created_utc}000`, 10)).fromNow(),
             isOP: comment.is_submitter,
             isGilded: comment.gilded > 0,
@@ -250,7 +250,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 @media screen and (max-width: 768px) {
   .post-title {
     padding: 0.7rem !important;
@@ -269,10 +269,6 @@ export default {
   .post {
     width: 100%;
     margin: 25px auto;
-  }
-
-  .hide-on-mobile {
-    display: none !important;
   }
 
   .card-content {
@@ -297,10 +293,14 @@ export default {
     max-width: 700px;
     margin: 25px auto;
   }
+}
 
-  .hide-on-desktop {
-    display: none !important;
-  }
+.card-header a {
+  color: inherit;
+}
+
+.title a {
+  color: inherit;
 }
 
 .center {

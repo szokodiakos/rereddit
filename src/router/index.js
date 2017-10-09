@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import Page from '@/components/Page';
+import Subreddit from '@/components/Subreddit';
 
 Vue.use(Router);
 
@@ -9,22 +9,22 @@ export default new Router({
     {
       path: '/',
       name: 'front-page',
-      component: Page,
+      component: Subreddit,
     },
     {
       path: '/:modifier',
       name: 'front-page-with-modifier',
-      component: Page,
+      component: Subreddit,
     },
     {
       path: '/r/:subreddit',
       name: 'subreddit-page',
-      component: Page,
+      component: Subreddit,
     },
     {
       path: '/r/:subreddit/:modifier',
       name: 'subreddit-page-with-modifier',
-      component: Page,
+      component: Subreddit,
     },
   ],
 });
