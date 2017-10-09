@@ -36,7 +36,7 @@
         </ul>
       </div>
 
-      <div v-if="modifier === 'controversial' || modifier === 'top'" style="display:flex; justify-content: center">
+      <div v-if="modifier === 'controversial' || modifier === 'top'" style="display:flex; justify-content: center;">
         <span style="padding-top: 6px; padding-right: 6px;">Show posts from</span>
         <b-dropdown>
           <button class="button is-primary is-outlined" slot="trigger">
@@ -53,46 +53,48 @@
         </b-dropdown>
       </div>
 
-      <div v-if="isPostsLoading" style="position: absolute;left: 50%;top: 70%;-webkit-transform: translate(-50%, -50%);transform: translate(-50%, -50%);">
-        <rotate-loader></rotate-loader>
-      </div>
-      <div v-else>
-        <div v-if="!posts.length" style="display: flex; justify-content: center;">
-          <h2 class="title is-2" style="margin-top: 25px; color: #95a5a6;">No posts <b-icon pack="fa" icon="frown-o" size="is-large"></b-icon></h2>
+      <div v-bind:style="{ 'text-align': isPostsLoading ? 'center' : 'left' }">
+        <div v-if="isPostsLoading" style="margin-top: 70px;">
+          <rotate-loader></rotate-loader>
         </div>
-        <Post
-          v-for="post in posts"
-          v-bind:key="post.id"
-          :id="post.id"
-          :color="post.color"
-          :author="post.author"
-          :text-color="post.textColor"
-          :subreddit="post.subreddit"
-          :date="post.date"
-          :url="post.url"
-          :click-url="post.clickUrl || post.url"
-          :domain="post.domain"
-          :is-sticky="post.isSticky"
-          :type="post.type"
-          :thumbnail="post.thumbnail"
-          :title="post.title"
-          :details="post.details"
-          :media-id="post.mediaId"
-          :score="post.score"
-          :comment-count="post.commentCount"
-          :permalink="post.permalink"
-          :tag="post.tag"
-          :is-nsfw="post.isNsfw"
-        ></Post>
-        <infinite-loading
-          style="height: 100px; margin-top:50px"
-          v-if="lastPostId"
-          @infinite="infiniteHandler"
-        >
-          <span slot="spinner">
-            <rotate-loader></rotate-loader>
-          </span>
-        </infinite-loading>
+        <div v-else>
+          <div v-if="!posts.length" style="display: flex; justify-content: center;">
+            <h2 class="title is-2" style="margin-top: 25px; color: #95a5a6;">No posts <b-icon pack="fa" icon="frown-o" size="is-large"></b-icon></h2>
+          </div>
+          <Post
+            v-for="post in posts"
+            v-bind:key="post.id"
+            :id="post.id"
+            :color="post.color"
+            :author="post.author"
+            :text-color="post.textColor"
+            :subreddit="post.subreddit"
+            :date="post.date"
+            :url="post.url"
+            :click-url="post.clickUrl || post.url"
+            :domain="post.domain"
+            :is-sticky="post.isSticky"
+            :type="post.type"
+            :thumbnail="post.thumbnail"
+            :title="post.title"
+            :details="post.details"
+            :media-id="post.mediaId"
+            :score="post.score"
+            :comment-count="post.commentCount"
+            :permalink="post.permalink"
+            :tag="post.tag"
+            :is-nsfw="post.isNsfw"
+          ></Post>
+          <infinite-loading
+            style="height: 100px; margin-top:50px"
+            v-if="lastPostId"
+            @infinite="infiniteHandler"
+          >
+            <span slot="spinner">
+              <rotate-loader></rotate-loader>
+            </span>
+          </infinite-loading>
+        </div>
       </div>
     </div>
   </div>

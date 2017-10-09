@@ -28,7 +28,7 @@
             <span v-if="isNsfw" class="tag" style="background-color: #e74c3c; color: white">nsfw</span>
           </p>
         </div>
-        <div v-if="type === postType.OTHER">
+        <div v-else>
           <article class="media">
             <figure class="media-left hide-on-mobile">
               <p class="image width-128">
@@ -38,13 +38,13 @@
               </p>
             </figure>
             <div class="media-content">
-              <a :href="clickUrl" target="_blank">
-                <p class="title post-title">
+              <p class="title post-title">
+                <a :href="clickUrl" target="_blank">
                   {{ title }}&nbsp;
-                  <span v-if="tag" class="tag">{{ tag }}</span>
-                  <span v-if="isNsfw" class="tag" style="background-color: #e74c3c; color: white">nsfw</span>
-                </p>
-              </a>
+                </a>
+                <span v-if="tag" class="tag">{{ tag }}</span>
+                <span v-if="isNsfw" class="tag" style="background-color: #e74c3c; color: white">nsfw</span>
+              </p>
               <p class="image width-128 hide-on-desktop center" style="margin-top: 10px;">
                 <a :href="clickUrl" target="_blank">
                   <img :src="thumbnail">
@@ -56,7 +56,7 @@
         </div>
         <br v-if="type !== postType.OTHER" class="hide-on-mobile">
         <div v-if="type === postType.VIDEO">
-          <video class="center full-width" preload="auto" autoplay="autoplay" muted="muted" loop="loop" webkit-playsinline="">
+          <video class="center full-width" preload="auto" autoplay="autoplay" muted="muted" loop="loop" webkit-playsinline="" playsinline>
             <source :src="url" type="video/mp4"></source>
           </video>
         </div>
@@ -123,7 +123,14 @@
         interactive: true,
         size: 'small',
         sticky: true,
-        delay: [300, 100]
+        delay: [300, 100],
+        popperOptions: {
+          modifiers: {
+            flip: {
+              enabled: false
+            }
+          }
+        }
       }" class="card-footer-item" :data-html="`#tooltip-content-${id}`">
         <div :id="`tooltip-content-${id}`" style="display:none">
           <strong>
@@ -247,11 +254,11 @@ export default {
 @media screen and (max-width: 768px) {
   .post-title {
     padding: 0.7rem !important;
-    line-height: 1;
+    line-height: 0.8;
   }
 
   .post-title a {
-    font-size: 1.6rem;
+    font-size: 1.1rem;
   }
 
   .card-header-title {
@@ -317,6 +324,10 @@ export default {
 
 .tag {
   text-transform: uppercase;
+}
+
+.text-content {
+  text-align: justify;
 }
 
 </style>
