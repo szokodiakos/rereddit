@@ -316,12 +316,6 @@ export default {
   white-space: nowrap;
 }
 
-.tippy-tooltip.light-theme {
-  min-height: 200px;
-  width: 680px;
-  max-width: 100%;
-}
-
 .tag {
   text-transform: uppercase;
 }

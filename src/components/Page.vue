@@ -1,6 +1,9 @@
 <template>
   <div>
-    <div v-if="isLoading" class="loader">
+    <div
+      v-if="isLoading"
+      style="position:absolute;left:50%;top:50%;-webkit-transform:translate(-50%, -50%);transform:translate(-50%, -50%);"
+    >
       <rotate-loader></rotate-loader>
     </div>
     <div v-else>
@@ -22,15 +25,5 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.loader {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  -webkit-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
-}
-</style>
 
 

@@ -22,5 +22,11 @@ export default {
     display: none !important;
   }
 }
+
+.tippy-tooltip.light-theme {
+  min-height: 200px;
+  width: 680px;
+  max-width: 100%;
+}
 </style>
 

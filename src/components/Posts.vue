@@ -1,11 +1,11 @@
 <template>
   <div v-bind:style="{ 'text-align': isPostsLoading ? 'center' : 'left' }">
-    <div v-if="isPostsLoading" style="margin-top: 70px;">
+    <div v-if="isPostsLoading" class="post-loader">
       <rotate-loader></rotate-loader>
     </div>
     <div v-else>
-      <div v-if="!posts.length" style="display: flex; justify-content: center;">
-        <h2 class="title is-2" style="margin-top: 25px; color: #95a5a6;">
+      <div v-if="!posts.length" class="no-posts-message">
+        <h2 class="title is-2">
           No posts <b-icon pack="fa" icon="frown-o" size="is-large"></b-icon>
         </h2>
       </div>
@@ -33,11 +33,7 @@
         :tag="post.tag"
         :is-nsfw="post.isNsfw"
       ></Post>
-      <infinite-loading
-        style="height: 100px; margin-top:50px"
-        v-if="lastPostId"
-        @infinite="infiniteHandler"
-      >
+      <infinite-loading v-if="lastPostId" class="infinite-loader" @infinite="infiniteHandler">
         <span slot="spinner">
           <rotate-loader></rotate-loader>
         </span>
@@ -267,5 +263,23 @@ export default {
 </script>
 
 <style scoped>
+.post-loader {
+  margin-top: 70px;
+}
+
+.no-posts-message {
+  display: flex;
+  justify-content: center;
+}
+
+.no-posts-message h2 {
+  margin-top: 25px;
+  color: #95a5a6;
+}
+
+.infinite-loader {
+  height: 100px;
+  margin-top:50px;
+}
 
 </style>
