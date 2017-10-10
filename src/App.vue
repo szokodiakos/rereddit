@@ -33,5 +33,13 @@ export default {
   display: block;
   margin: auto;
 }
+
+.full-width {
+  width: 100%;
+}
+
+.no-wrap {
+  white-space: nowrap;
+}
 </style>
 

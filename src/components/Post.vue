@@ -11,49 +11,25 @@
     </header>
     <div class="card-content" style="overflow-x: auto;">
       <div class="content">
-        <div v-if="type !== postTypes.OTHER">
-          <p class="title post-title">
-            <a :href="clickUrl" target="_blank">
-              <b-icon
-                v-if="isSticky"
-                style="padding-left: 5px; color: #e74c3c;"
-                size="is-medium"
-                class="fa-rotate-270"
-                pack="fa"
-                icon="thumb-tack"
-              ></b-icon>
-              {{ title }}
-            </a>
-            <span v-if="tag" class="tag">{{ tag }}</span>
-            <span v-if="isNsfw" class="tag" style="background-color: #e74c3c; color: white">nsfw</span>
-          </p>
-        </div>
-        <div v-else>
-          <article class="media">
-            <figure class="media-left hide-on-mobile">
-              <p class="image width-128">
-                <a :href="clickUrl" target="_blank">
-                  <img :src="thumbnail">
-                </a>
-              </p>
-            </figure>
-            <div class="media-content">
-              <p class="title post-title">
-                <a :href="clickUrl" target="_blank">
-                  {{ title }}&nbsp;
-                </a>
-                <span v-if="tag" class="tag">{{ tag }}</span>
-                <span v-if="isNsfw" class="tag" style="background-color: #e74c3c; color: white">nsfw</span>
-              </p>
-              <p class="image width-128 hide-on-desktop center" style="margin-top: 10px;">
-                <a :href="clickUrl" target="_blank">
-                  <img :src="thumbnail">
-                </a>
-              </p>
-              <br>
-            </div>
-          </article>
-        </div>
+        <PostTitle
+          v-if="type !== postTypes.OTHER"
+          :title="title"
+          :click-url="clickUrl"
+          :is-sticky="isSticky"
+          :is-nsfw="isNsfw"
+          :tag="tag"
+        ></PostTitle>
+
+        <ThumbnailPostTitle
+          v-else
+          :title="title"
+          :click-url="clickUrl"
+          :is-sticky="isSticky"
+          :is-nsfw="isNsfw"
+          :tag="tag"
+          :thumbnail="thumbnail"
+        ></ThumbnailPostTitle>
+
         <br v-if="type !== postTypes.OTHER" class="hide-on-mobile">
         <div v-if="type === postTypes.VIDEO">
           <video class="center full-width" preload="auto" autoplay="autoplay" muted="muted" loop="loop" webkit-playsinline="" playsinline>
@@ -180,6 +156,8 @@
 <script>
 import postTypes from '@/enums/postTypes';
 import common from '@/common';
+import PostTitle from '@/components/PostTitle';
+import ThumbnailPostTitle from '@/components/ThumbnailPostTitle';
 import VueMarkdown from 'vue-markdown';
 import RotateLoader from 'vue-spinner/src/RotateLoader';
 import _ from 'lodash';
@@ -224,6 +202,8 @@ export default {
   components: {
     VueMarkdown,
     RotateLoader,
+    PostTitle,
+    ThumbnailPostTitle,
   },
   props: [
     'id',
@@ -252,15 +232,6 @@ export default {
 
 <style scoped>
 @media screen and (max-width: 768px) {
-  .post-title {
-    padding: 0.7rem !important;
-    line-height: 0.8;
-  }
-
-  .post-title a {
-    font-size: 1.1rem;
-  }
-
   .card-header-title {
     padding: 0.4rem;
     font-size: 0.8rem;
@@ -275,16 +246,8 @@ export default {
     padding: 0px;
   }
 
-  .card-content .title {
-    padding: 1.5rem;
-  }
-
   .card-content .text-content {
     padding: 1.5rem;
-  }
-
-  .full-width {
-    width: 100%;
   }
 }
 
@@ -297,27 +260,6 @@ export default {
 
 .card-header a {
   color: inherit;
-}
-
-.title a {
-  color: inherit;
-}
-
-.center {
-  display: block;
-  margin: auto;
-}
-
-.width-128 {
-  width: 128px;
-}
-
-.no-wrap {
-  white-space: nowrap;
-}
-
-.tag {
-  text-transform: uppercase;
 }
 
 .text-content {
