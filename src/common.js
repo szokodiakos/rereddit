@@ -31,4 +31,7 @@ export default {
 
     return ((255 - bgDelta) < nThreshold) ? '#000000' : '#ffffff';
   },
+  mod(n, m) {
+    return ((n % m) + m) % m;
+  },
 };

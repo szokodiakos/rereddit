@@ -28,5 +28,10 @@ export default {
   width: 680px;
   max-width: 100%;
 }
+
+.center {
+  display: block;
+  margin: auto;
+}
 </style>
 
