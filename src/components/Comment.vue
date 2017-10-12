@@ -1,7 +1,7 @@
 <template>
   <article class="media">
     <div class="media-content">
-      <div class="content">
+      <div class="content" style="padding-left: 15px; padding-right: 15px;">
         <strong>{{ author }}</strong>
         &middot;
         {{ date }}
@@ -12,7 +12,7 @@
         <b-icon v-if="isSticky" pack="fa" icon="thumb-tack" class="fa-rotate-270 red-color" size="is-small" style="margin-bottom: 3px;"></b-icon>
         <strong v-if="isOP" style="color: #3498db; text-transform: uppercase;">op</strong>
         <br>
-        <span v-html="body"></span>
+        <span v-html="body" style="text-align: justify;"></span>
       </div>
     </div>
   </article>

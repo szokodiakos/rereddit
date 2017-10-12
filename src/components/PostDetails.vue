@@ -4,15 +4,12 @@
       <div v-if="isPostLoading" class="post-loader">
         <rotate-loader></rotate-loader>
       </div>
+
       <div v-else>
         <component :is="postPack.component" v-bind="postPack"></component>
-      </div>
-
-      <div v-if="!isPostLoading && isCommentsLoading" class="post-loader">
-        <rotate-loader></rotate-loader>
-      </div>
-      <div v-else>
-        <Comment></Comment>
+        <div class="container" style="margin-bottom: 100px;">
+          <Comment v-for="comment in comments" :key="comment.id" :comment="comment"></Comment>
+        </div>
       </div>
     </div>
   </Page>
@@ -30,8 +27,8 @@ export default {
   data() {
     return {
       isPostLoading: true,
-      isCommentsLoading: true,
       postPack: null,
+      comments: [],
     };
   },
   async created() {
@@ -41,6 +38,9 @@ export default {
     const color = _.get(subredditResponse, 'body.data.key_color') || common.DEFAULT_COLOR;
     const textColor = common.getTextColor(color);
     const post = _.get(response, 'body[0].data.children[0].data', {});
+    this.comments = _.get(response, 'body[1].data.children', [])
+      .filter(({ kind }) => kind !== 'more')
+      .map(({ data: comment }) => comment);
 
     this.postPack = {
       post,
