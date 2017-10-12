@@ -24,7 +24,7 @@
 
       <div class="container">
         <h1 v-if="subreddit" class="title" v-bind:style="{ color: textColor }">
-          <router-link :to="subreddit">{{ subreddit }}</router-link>
+          <router-link :to="subreddit" style="white-space: nowrap;">{{ subreddit }}</router-link>
         </h1>
         <h1 v-else class="title" v-bind:style="{ color: textColor }">
           Rereddit
@@ -124,5 +124,9 @@ export default {
 
 .tag {
   text-transform: uppercase;
+}
+
+h1 {
+  white-space: nowrap;
 }
 </style>
