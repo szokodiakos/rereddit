@@ -1,4 +1,5 @@
 import numeral from 'numeral';
+import moment from 'moment';
 
 function format(n) {
   return (n > 1000 ? '0.0a' : '0a');
@@ -33,5 +34,8 @@ export default {
   },
   mod(n, m) {
     return ((n % m) + m) % m;
+  },
+  formatDate(date) {
+    return moment.utc(parseInt(`${date}000`, 10)).fromNow();
   },
 };

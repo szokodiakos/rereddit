@@ -9,30 +9,15 @@
           No posts <b-icon pack="fa" icon="frown-o" size="is-large"></b-icon>
         </h2>
       </div>
-      <Post
-        v-for="post in posts"
-        v-bind:key="post.id"
-        :id="post.id"
-        :color="post.color"
-        :author="post.author"
-        :text-color="post.textColor"
-        :subreddit="post.subreddit"
-        :date="post.date"
-        :url="post.url"
-        :click-url="post.clickUrl || post.url"
-        :domain="post.domain"
-        :is-sticky="post.isSticky"
-        :type="post.type"
-        :thumbnail="post.thumbnail"
-        :title="post.title"
-        :details="post.details"
-        :media-id="post.mediaId"
-        :score="post.score"
-        :comment-count="post.commentCount"
-        :permalink="post.permalink"
-        :tag="post.tag"
-        :is-nsfw="post.isNsfw"
-      ></Post>
+
+      <component
+        v-for="postPack in posts"
+        :key="postPack.post.id"
+        :is="postPack.component"
+        v-bind="postPack"
+      >
+      </component>
+
       <infinite-loading v-if="lastPostId" class="infinite-loader" @infinite="infiniteHandler">
         <span slot="spinner">
           <rotate-loader></rotate-loader>
@@ -45,48 +30,28 @@
 <script>
 import RotateLoader from 'vue-spinner/src/RotateLoader';
 import _ from 'lodash';
-import he from 'he';
-import moment from 'moment';
 import InfiniteLoading from 'vue-infinite-loading';
 import common from '@/common';
 import Post from '@/components/Post';
-import postTypes from '@/enums/postTypes';
+import ImagePost from '@/components/ImagePost';
+import OtherPost from '@/components/OtherPost';
+import VideoPost from '@/components/VideoPost';
+import YoutubePost from '@/components/YoutubePost';
+import SelfPost from '@/components/SelfPost';
+import TwitchPost from '@/components/TwitchPost';
+import StreamablePost from '@/components/StreamablePost';
+import GfycatPost from '@/components/GfycatPost';
 
-function getStreamableId(url) {
-  const regExp = /^.*streamable\.com\/(.*)/;
-  const match = url.match(regExp);
-  if (match && match[1]) {
-    return match[1];
-  }
-  return undefined;
-}
-
-function getGfycatId(url) {
-  const regExp = /^.*gfycat\.com\/(.*)/;
-  const match = url.match(regExp);
-  if (match) {
-    return _.last(url.split('/'));
-  }
-  return undefined;
-}
-
-function getTwitchId(url) {
-  const regExp = /^.*clips\.twitch\.tv\/(.*)\?/;
-  const match = url.match(regExp);
-  if (match && match[1]) {
-    return match[1];
-  }
-  return undefined;
-}
-
-function getYoutubeId(url) {
-  const regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-  const match = url.match(regExp);
-  if (match && match[2].length === 11) {
-    return match[2];
-  }
-  return undefined;
-}
+const postComponents = [
+  ImagePost,
+  VideoPost,
+  YoutubePost,
+  SelfPost,
+  TwitchPost,
+  StreamablePost,
+  GfycatPost,
+];
+postComponents.push(OtherPost);
 
 export default {
   name: 'posts',
@@ -95,7 +60,6 @@ export default {
       colors: {},
       posts: [],
       isPostsLoading: true,
-      postTypes,
       lastPostId: '',
     };
   },
@@ -121,32 +85,25 @@ export default {
     },
   },
   methods: {
-    async populatePostDetails(posts) {
-      const subreddits = _.uniq(posts.map(post => post.subreddit));
-
-      // prefetch subreddits
-      await Promise.all(subreddits.map(subreddit => this.getColorBySubreddit(subreddit)));
-
-      return Promise.all(posts.map(async (post) => {
-        const rawDetails = await post.detailsPromise;
-        const details = he.decode(_.get(rawDetails, 'body.[0].data.children[0].data.selftext', ''));
-        const color = await this.getColorBySubreddit(post.subreddit);
-        const textColor = common.getTextColor(color);
-        return {
-          ...post,
-          details,
-          color,
-          textColor,
-        };
-      }));
+    handles(post) {
+      const { component } = postComponents.find(postComponent => postComponent.handles(post));
+      return component.name;
     },
-    async getColorBySubreddit(subreddit) {
+    getColorByPost({ subreddit_name_prefixed: subreddit }) {
+      return this.colors[subreddit].color;
+    },
+    getTextColorByPost({ subreddit_name_prefixed: subreddit }) {
+      return this.colors[subreddit].textColor;
+    },
+    async populateColorBySubreddit(subreddit) {
       if (!this.colors[subreddit]) {
         const response = await this.$http.get(`https://www.reddit.com/${subreddit}/about.json`);
         const color = _.get(response, 'body.data.key_color') || common.DEFAULT_COLOR;
-        this.colors[subreddit] = color;
+        this.colors[subreddit] = {
+          color,
+          textColor: common.getTextColor(color),
+        };
       }
-      return this.colors[subreddit];
     },
     async getPosts({ after } = {}) {
       const modifier = this.modifier ?
@@ -162,88 +119,22 @@ export default {
         requestUrl += `&after=t3_${after}`;
       }
       const response = await this.$http.get(requestUrl);
-      const posts = response.body.data.children.map(({ data: post }) => {
-        const id = post.id;
-        const title = he.decode(post.title);
-        const score = common.formatNumber(post.score);
-        const commentCount = common.formatNumber(post.num_comments);
-        const subredditName = post.subreddit_name_prefixed;
-        const author = post.author;
-        const date = moment.utc(parseInt(`${post.created_utc}000`, 10)).fromNow();
-        const domain = post.domain;
-        const thumbnail = (!post.thumbnail || post.thumbnail === 'default') ? 'static/reddit.jpeg' : post.thumbnail;
-        const permalink = post.permalink;
-        const isSticky = post.stickied;
-        const isNsfw = post.over_18;
-        const tag = he.decode(post.link_flair_text || '');
-        let url = post.url;
-        let clickUrl;
-        let detailsPromise = Promise.resolve();
-        let mediaId;
+      const posts = response.body.data.children.map(({ data: post }) => post);
+      const subreddits = _.uniq(posts.map(post => post.subreddit_name_prefixed));
 
-        let type;
-        if (url.endsWith('.gifv')) {
-          url = url.replace(/gifv$/, 'mp4');
-          type = this.postTypes.VIDEO;
-        } else if (url.endsWith('.mp4')) {
-          type = this.postTypes.VIDEO;
-        } else if (url.startsWith('https://imgur.com/a/')) {
-          type = this.postTypes.IMAGE;
-          clickUrl = url;
-          url = _.get(post, 'media.oembed.thumbnail_url', '').replace('?fb', '');
-        } else if (url.endsWith('.gif')) {
-          type = this.postTypes.GIF;
-        } else if (url.endsWith('.png') || url.endsWith('.jpg') || domain === 'i.imgur.com') {
-          type = this.postTypes.IMAGE;
-        } else if (domain === 'imgur.com') {
-          type = this.postTypes.IMAGE;
-          url = `${url.replace('imgur.com', 'i.imgur.com')}.jpg`;
-        } else if (domain.startsWith('self.')) {
-          type = this.postTypes.SELF;
-          detailsPromise = this.$http.get(`${url.slice(0, -1)}.json`);
-        } else if (domain.endsWith('youtube.com') || domain === 'youtu.be') {
-          type = this.postTypes.YOUTUBE;
-          mediaId = getYoutubeId(url);
-        } else if (domain === 'clips.twitch.tv') {
-          type = this.postTypes.TWITCH;
-          mediaId = getTwitchId(url);
-        } else if (domain === 'gfycat.com') {
-          type = this.postTypes.GFYCAT;
-          mediaId = getGfycatId(url);
-        // } else if (domain === 'v.redd.it') {
-        //   type = this.postTypes.VREDDIT;
-        // instagram
-        } else if (domain === 'streamable.com') {
-          type = this.postTypes.STREAMABLE;
-          mediaId = getStreamableId(url);
-        } else {
-          type = this.postTypes.OTHER;
-        }
+      // prefetch subreddits
+      await Promise.all(subreddits.map(subreddit => this.populateColorBySubreddit(subreddit)));
 
-        return {
-          id,
-          title,
-          score,
-          commentCount,
-          url,
-          subreddit: subredditName,
-          author,
-          domain,
-          date,
-          detailsPromise,
-          type,
-          thumbnail,
-          mediaId,
-          isSticky,
-          permalink,
-          clickUrl,
-          tag,
-          isNsfw,
-        };
-      });
-      const populatedPosts = await this.populatePostDetails(posts);
       this.lastPostId = _.get(posts, `[${posts.length - 1}].id`);
-      return populatedPosts;
+
+      const postPacks = posts.map(post => ({
+        post,
+        color: this.getColorByPost(post),
+        textColor: this.getTextColorByPost(post),
+        component: this.handles(post),
+      }));
+
+      return postPacks;
     },
     async infiniteHandler($state) {
       if (!this.lastPostId) {
@@ -258,6 +149,14 @@ export default {
     InfiniteLoading,
     Post,
     RotateLoader,
+    ImagePost: ImagePost.component,
+    VideoPost: VideoPost.component,
+    YoutubePost: YoutubePost.component,
+    SelfPost: SelfPost.component,
+    TwitchPost: TwitchPost.component,
+    OtherPost: OtherPost.component,
+    StreamablePost: StreamablePost.component,
+    GfycatPost: GfycatPost.component,
   },
 };
 </script>

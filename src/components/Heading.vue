@@ -100,6 +100,11 @@ export default {
   text-align: center;
 }
 
+.header-img img {
+  max-width: 120px;
+  max-height: 120px;
+}
+
 .badges {
   position: relative;
   bottom: -37px;

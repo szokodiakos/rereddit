@@ -21,7 +21,7 @@
         <li
           v-else
           v-for="result in results"
-          v-bind:key="result.name"
+          :key="result.name"
           @click="openSubreddit(result)"
           @mouseover="resultMouseover(result)"
           v-bind:style="{

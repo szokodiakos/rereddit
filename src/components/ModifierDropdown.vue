@@ -8,7 +8,7 @@
       <b-dropdown-item
         v-if="fromOption.query !== selectedFrom.query"
         v-for="fromOption in fromOptions"
-        v-bind:key="fromOption.query"
+        :key="fromOption.query"
         @click="changeFrom(fromOption)"
       >
         {{ fromOption.label }}</router-link>

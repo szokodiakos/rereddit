@@ -2,21 +2,15 @@
   <article class="media">
     <figure class="media-left hide-on-mobile">
       <p class="image width-128">
-        <a :href="clickUrl" target="_blank">
+        <a :href="url" target="_blank">
           <img :src="thumbnail">
         </a>
       </p>
     </figure>
     <div class="media-content">
-      <PostTitle
-        :title="title"
-        :click-url="clickUrl"
-        :is-sticky="isSticky"
-        :is-nsfw="isNsfw"
-        :tag="tag"
-      ></PostTitle>
+      <PostTitle v-bind="$props"></PostTitle>
       <p class="image width-128 hide-on-desktop center" style="margin-top: 10px;">
-        <a :href="clickUrl" target="_blank">
+        <a :href="url" target="_blank">
           <img :src="thumbnail">
         </a>
       </p>
@@ -27,17 +21,19 @@
 
 <script>
 import PostTitle from '@/components/PostTitle';
+import isUrl from 'is-url';
 
 export default {
   name: 'thumbnailPostTitle',
   props: [
-    'title',
-    'clickUrl',
-    'isSticky',
-    'tag',
-    'isNsfw',
-    'thumbnail',
+    'post',
   ],
+  data() {
+    return {
+      url: this.post.url,
+      thumbnail: (!isUrl(this.post.thumbnail)) ? 'static/reddit.jpeg' : this.post.thumbnail,
+    };
+  },
   components: {
     PostTitle,
   },

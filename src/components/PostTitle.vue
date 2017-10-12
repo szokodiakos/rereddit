@@ -1,31 +1,37 @@
 <template>
   <p class="title post-title">
-    <a :href="clickUrl" target="_blank">
+    <a :href="url" target="_blank">
       <b-icon
         v-if="isSticky"
-        style="padding-left: 5px; color: #e74c3c;"
         size="is-medium"
-        class="fa-rotate-270"
+        class="fa-rotate-270 sticky"
         pack="fa"
         icon="thumb-tack"
       ></b-icon>
       {{ title }}
     </a>
     <span v-if="tag" class="tag">{{ tag }}</span>
-    <span v-if="isNsfw" class="tag" style="background-color: #e74c3c; color: white">nsfw</span>
+    <span v-if="isNsfw" class="tag nsfw">nsfw</span>
   </p>
 </template>
 
 <script>
+import he from 'he';
+
 export default {
   name: 'postTitle',
   props: [
-    'title',
-    'clickUrl',
-    'isSticky',
-    'tag',
-    'isNsfw',
+    'post',
   ],
+  data() {
+    return {
+      url: this.post.url,
+      isSticky: this.post.stickied,
+      isNsfw: this.post.over_18,
+      title: he.decode(this.post.title),
+      tag: he.decode(this.post.link_flair_text || ''),
+    };
+  },
 };
 </script>
 
@@ -45,13 +51,21 @@ export default {
   }
 }
 
-
-
 .title a {
   color: inherit;
 }
 
 .tag {
   text-transform: uppercase;
+}
+
+.nsfw {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.sticky {
+  padding-left: 5px;
+  color: #e74c3c;
 }
 </style>
