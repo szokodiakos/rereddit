@@ -1,5 +1,29 @@
 import numeral from 'numeral';
 import moment from 'moment';
+import ImagePost from '@/components/ImagePost';
+import OtherPost from '@/components/OtherPost';
+import VideoPost from '@/components/VideoPost';
+import YoutubePost from '@/components/YoutubePost';
+import SelfPost from '@/components/SelfPost';
+import TwitchPost from '@/components/TwitchPost';
+import StreamablePost from '@/components/StreamablePost';
+import GfycatPost from '@/components/GfycatPost';
+
+const postComponentsArray = [
+  ImagePost,
+  VideoPost,
+  YoutubePost,
+  SelfPost,
+  TwitchPost,
+  StreamablePost,
+  GfycatPost,
+];
+postComponentsArray.push(OtherPost);
+
+export const postComponents = postComponentsArray.reduce((state, c) => ({
+  ...state,
+  [c.component.name]: c.component,
+}), {});
 
 function format(n) {
   return (n > 1000 ? '0.0a' : '0a');
@@ -38,8 +62,8 @@ export default {
   formatDate(date) {
     return moment.utc(parseInt(`${date}000`, 10)).fromNow();
   },
-  handles(post, postComponents) {
-    const { component } = postComponents.find(postComponent => postComponent.handles(post));
+  handles(post) {
+    const { component } = postComponentsArray.find(postComponent => postComponent.handles(post));
     return component.name;
   },
 };

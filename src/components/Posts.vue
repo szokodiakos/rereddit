@@ -31,27 +31,8 @@
 import RotateLoader from 'vue-spinner/src/RotateLoader';
 import _ from 'lodash';
 import InfiniteLoading from 'vue-infinite-loading';
-import common from '@/common';
+import common, { postComponents } from '@/common';
 import Post from '@/components/Post';
-import ImagePost from '@/components/ImagePost';
-import OtherPost from '@/components/OtherPost';
-import VideoPost from '@/components/VideoPost';
-import YoutubePost from '@/components/YoutubePost';
-import SelfPost from '@/components/SelfPost';
-import TwitchPost from '@/components/TwitchPost';
-import StreamablePost from '@/components/StreamablePost';
-import GfycatPost from '@/components/GfycatPost';
-
-const postComponents = [
-  ImagePost,
-  VideoPost,
-  YoutubePost,
-  SelfPost,
-  TwitchPost,
-  StreamablePost,
-  GfycatPost,
-];
-postComponents.push(OtherPost);
 
 export default {
   name: 'posts',
@@ -127,7 +108,7 @@ export default {
         post,
         color: this.getColorByPost(post),
         textColor: this.getTextColorByPost(post),
-        component: common.handles(post, postComponents),
+        component: common.handles(post),
       }));
 
       return postPacks;
@@ -145,14 +126,7 @@ export default {
     InfiniteLoading,
     Post,
     RotateLoader,
-    ImagePost: ImagePost.component,
-    VideoPost: VideoPost.component,
-    YoutubePost: YoutubePost.component,
-    SelfPost: SelfPost.component,
-    TwitchPost: TwitchPost.component,
-    OtherPost: OtherPost.component,
-    StreamablePost: StreamablePost.component,
-    GfycatPost: GfycatPost.component,
+    ...postComponents,
   },
 };
 </script>
