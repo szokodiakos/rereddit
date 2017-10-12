@@ -1,8 +1,18 @@
 <template>
   <Page :subreddit="subreddit">
     <div slot="content">
-      <div v-if="!isLoading">
+      <div v-if="isPostLoading" class="post-loader">
+        <rotate-loader></rotate-loader>
+      </div>
+      <div v-else>
         <component :is="postPack.component" v-bind="postPack"></component>
+      </div>
+
+      <div v-if="!isPostLoading && isCommentsLoading" class="post-loader">
+        <rotate-loader></rotate-loader>
+      </div>
+      <div v-else>
+        <Comment></Comment>
       </div>
     </div>
   </Page>
@@ -11,13 +21,16 @@
 <script>
 import _ from 'lodash';
 import Page from '@/components/Page';
+import Comment from '@/components/Comment';
+import RotateLoader from 'vue-spinner/src/RotateLoader';
 import common, { postComponents } from '@/common';
 
 export default {
   name: 'postDetails',
   data() {
     return {
-      isLoading: true,
+      isPostLoading: true,
+      isCommentsLoading: true,
       postPack: null,
     };
   },
@@ -25,7 +38,7 @@ export default {
     const permalink = this.$route.path;
     const response = await this.$http.get(`https://www.reddit.com${permalink}.json`);
     const subredditResponse = await this.$http.get(`https://www.reddit.com/${this.subreddit}/about.json`);
-    const color = _.get(subredditResponse, 'body.data.key_color', common.DEFAULT_COLOR);
+    const color = _.get(subredditResponse, 'body.data.key_color') || common.DEFAULT_COLOR;
     const textColor = common.getTextColor(color);
     const post = _.get(response, 'body[0].data.children[0].data', {});
 
@@ -36,7 +49,7 @@ export default {
       component: common.handles(post),
     };
 
-    this.isLoading = false;
+    this.isPostLoading = false;
   },
   computed: {
     subreddit() {
@@ -45,11 +58,16 @@ export default {
   },
   components: {
     Page,
+    RotateLoader,
+    Comment,
     ...postComponents,
   },
 };
 </script>
 
 <style scoped>
-
+.post-loader {
+  text-align: center;
+  margin-top: 70px;
+}
 </style>

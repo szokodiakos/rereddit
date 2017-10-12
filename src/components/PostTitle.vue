@@ -1,6 +1,6 @@
 <template>
   <p class="title post-title">
-    <a :href="url" target="_blank">
+    <router-link :to="permalink">
       <b-icon
         v-if="isSticky"
         size="is-medium"
@@ -9,7 +9,7 @@
         icon="thumb-tack"
       ></b-icon>
       {{ title }}
-    </a>
+    </router-link>
     <span v-if="tag" class="tag">{{ tag }}</span>
     <span v-if="isNsfw" class="tag nsfw red-background">nsfw</span>
   </p>
@@ -30,6 +30,7 @@ export default {
       isNsfw: this.post.over_18,
       title: he.decode(this.post.title),
       tag: he.decode(this.post.link_flair_text || ''),
+      permalink: this.post.permalink,
     };
   },
 };

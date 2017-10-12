@@ -16,16 +16,22 @@
       </div>
 
       <div v-if="headerImg" class="header-img">
-        <img :src="headerImg">
+        <router-link v-if="subreddit" :to="subreddit">
+          <img :src="headerImg">
+        </router-link>
+        <img v-else :src="headerImg">
       </div>
 
       <div class="container">
-        <h1 class="title" v-bind:style="{ color: textColor }">
-          {{ subreddit || 'Rereddit' }}
+        <h1 v-if="subreddit" class="title" v-bind:style="{ color: textColor }">
+          <router-link :to="subreddit">{{ subreddit }}</router-link>
+        </h1>
+        <h1 v-else class="title" v-bind:style="{ color: textColor }">
+          Rereddit
         </h1>
 
         <h2 class="subtitle" v-bind:style="{ color: textColor }">
-          <span v-if="title">{{ title }}</span>
+          <span v-if="title"><router-link :to="subreddit">{{ title }}</router-link></span>
           <span v-else>An alternative <i class="fa fa-reddit-alien" aria-hidden="true"></i> client</span>
         </h2>
 
