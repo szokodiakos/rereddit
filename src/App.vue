@@ -43,23 +43,23 @@ export default {
 }
 
 .green-background {
-  background-color: #2ecc71;
+  background-color: #2ecc71 !important;
 }
 
 .green-color {
-  color: #2ecc71;
+  color: #2ecc71 !important;
 }
 
 .red-background {
-  background-color: #e74c3c;
+  background-color: #e74c3c !important;
 }
 
 .red-color {
-  color: #e74c3c;
+  color: #e74c3c !important;
 }
 
 .gold-color {
-  color: #ffd700;
+  color: #ffd700 !important;
 }
 </style>
 

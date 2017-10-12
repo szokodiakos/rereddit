@@ -115,4 +115,8 @@ export default {
 .online-badge {
   color: white;
 }
+
+.tag {
+  text-transform: uppercase;
+}
 </style>
