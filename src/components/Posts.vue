@@ -85,10 +85,6 @@ export default {
     },
   },
   methods: {
-    handles(post) {
-      const { component } = postComponents.find(postComponent => postComponent.handles(post));
-      return component.name;
-    },
     getColorByPost({ subreddit_name_prefixed: subreddit }) {
       return this.colors[subreddit].color;
     },
@@ -131,7 +127,7 @@ export default {
         post,
         color: this.getColorByPost(post),
         textColor: this.getTextColorByPost(post),
-        component: this.handles(post),
+        component: common.handles(post, postComponents),
       }));
 
       return postPacks;

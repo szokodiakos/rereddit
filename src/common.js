@@ -38,4 +38,8 @@ export default {
   formatDate(date) {
     return moment.utc(parseInt(`${date}000`, 10)).fromNow();
   },
+  handles(post, postComponents) {
+    const { component } = postComponents.find(postComponent => postComponent.handles(post));
+    return component.name;
+  },
 };
