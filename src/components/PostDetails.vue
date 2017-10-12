@@ -7,7 +7,7 @@
 
       <div v-else>
         <component :is="postPack.component" v-bind="postPack"></component>
-        <div class="container" style="margin-bottom: 100px;">
+        <div class="container" style="max-width: 700px; margin-bottom: 100px;">
           <Comment v-for="comment in comments" :key="comment.id" :comment="comment"></Comment>
         </div>
       </div>
