@@ -37,7 +37,7 @@
         <div class="control">
           <div class="tags has-addons">
             <span class="tag">{{ onlineUsers }}</span>
-            <span class="tag online-badge">online</span>
+            <span class="tag online-badge green-background">online</span>
           </div>
         </div>
         <div class="control">
@@ -113,7 +113,6 @@ export default {
 }
 
 .online-badge {
-  background-color: #2ecc71;
   color: white;
 }
 </style>

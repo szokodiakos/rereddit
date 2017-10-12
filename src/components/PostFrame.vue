@@ -17,7 +17,7 @@
     </div>
 
     <footer class="card-footer">
-      <label class="card-footer-item" style="color: #2ecc71;">
+      <label class="card-footer-item green-color">
           <b-icon style="margin-right: 8px;" pack="fa" icon="arrow-up"></b-icon> {{ score }}
       </label>
       <a @mouseover="loadTopComments(permalink)" ref="tippy" v-tippy="{
@@ -46,23 +46,8 @@
             <div v-if="!comments.length">
               <h4 class="title is-4" style="margin-top: 25px; color: #95a5a6;">No comments</h4>
             </div>
-            <article class="media" v-for="comment in comments" :key="comment.id">
-              <div class="media-content">
-                <div class="content">
-                  <strong>{{ comment.author }}</strong>
-                  &middot;
-                  {{ comment.date }}
-                  &middot;
-                  <b-icon pack="fa" icon="arrow-up" size="is-small" style="margin-bottom: 4px; color: #2ecc71"></b-icon>
-                  <span style="color: #2ecc71;">{{ comment.score }}</span>
-                  <b-icon v-if="comment.isGilded" pack="fa" icon="star" size="is-small" style="margin-bottom: 3px; color: #FFD700"></b-icon>
-                  <b-icon v-if="comment.isSticky" pack="fa" icon="thumb-tack" class="fa-rotate-270" size="is-small" style="margin-bottom: 3px; color: #e74c3c;"></b-icon>
-                  <strong v-if="comment.isOP" style="color: #3498db; text-transform: uppercase;">op</strong>
-                  <br>
-                  <span v-html="comment.body"></span>
-                </div>
-              </div>
-            </article>
+
+            <Comment v-for="comment in comments" :key="comment.id" :comment="comment"></Comment>
           </div>
           <button
             @click="closeTooltip"
@@ -81,14 +66,23 @@
 </template>
 
 <script>
+import _ from 'lodash';
+import VueMarkdown from 'vue-markdown';
+import RotateLoader from 'vue-spinner/src/RotateLoader';
+import he from 'he';
 import common from '@/common';
 import PostTitle from '@/components/PostTitle';
 import ThumbnailPostTitle from '@/components/ThumbnailPostTitle';
-import VueMarkdown from 'vue-markdown';
-import RotateLoader from 'vue-spinner/src/RotateLoader';
-import _ from 'lodash';
-import he from 'he';
-import moment from 'moment';
+import Comment from '@/components/Comment';
+
+
+function isCommentValid(comment) {
+  if (!comment.body_html) {
+    return false;
+  }
+  const body = he.decode(comment.body_html);
+  return !_.includes(body, '<div class="md"><p>[removed]</p>');
+}
 
 export default {
   name: 'postFrame',
@@ -116,17 +110,8 @@ export default {
         const response = await this.$http.get(`https://www.reddit.com${permalink}.json`);
         const comments = _.get(response, 'body[1].data.children', []);
         this.comments = comments
-          .map(({ data: comment }) => ({
-            id: comment.id,
-            author: comment.author,
-            body: comment.body_html ? he.decode(comment.body_html) : comment.body,
-            score: common.formatNumber(comment.score),
-            date: moment.utc(parseInt(`${comment.created_utc}000`, 10)).fromNow(),
-            isOP: comment.is_submitter,
-            isGilded: comment.gilded > 0,
-            isSticky: comment.stickied,
-          }))
-          .filter(({ body }) => !_.includes(body, '<div class="md"><p>[removed]</p>'))
+          .map(({ data: comment }) => comment)
+          .filter(isCommentValid)
           .slice(0, 3);
         this.areCommentsLoading = false;
       }
@@ -137,6 +122,7 @@ export default {
     RotateLoader,
     PostTitle,
     ThumbnailPostTitle,
+    Comment,
   },
   props: [
     'post',

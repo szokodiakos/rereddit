@@ -41,5 +41,25 @@ export default {
 .no-wrap {
   white-space: nowrap;
 }
+
+.green-background {
+  background-color: #2ecc71;
+}
+
+.green-color {
+  color: #2ecc71;
+}
+
+.red-background {
+  background-color: #e74c3c;
+}
+
+.red-color {
+  color: #e74c3c;
+}
+
+.gold-color {
+  color: #ffd700;
+}
 </style>
 

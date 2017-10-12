@@ -4,14 +4,14 @@
       <b-icon
         v-if="isSticky"
         size="is-medium"
-        class="fa-rotate-270 sticky"
+        class="fa-rotate-270 sticky red-color"
         pack="fa"
         icon="thumb-tack"
       ></b-icon>
       {{ title }}
     </a>
     <span v-if="tag" class="tag">{{ tag }}</span>
-    <span v-if="isNsfw" class="tag nsfw">nsfw</span>
+    <span v-if="isNsfw" class="tag nsfw red-background">nsfw</span>
   </p>
 </template>
 
@@ -60,12 +60,10 @@ export default {
 }
 
 .nsfw {
-  background-color: #e74c3c;
   color: white;
 }
 
 .sticky {
   padding-left: 5px;
-  color: #e74c3c;
 }
 </style>
