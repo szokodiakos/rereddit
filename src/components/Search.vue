@@ -121,6 +121,7 @@ export default {
       } else {
         this.$router.push({ name: 'front-page' });
       }
+      this.hideResults();
     },
     resultMouseover(result) {
       if (result.name !== '-1') {
