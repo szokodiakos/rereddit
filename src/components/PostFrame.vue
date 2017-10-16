@@ -42,12 +42,12 @@
           <div v-if="areCommentsLoading">
             <rotate-loader style="margin-top: 14%; margin-bottom: 13%;"></rotate-loader>
           </div>
-          <div v-else style="padding: 10px">
+          <div v-else class="top-comments-body">
             <div v-if="!comments.length">
               <h4 class="title is-4" style="margin-top: 25px; color: #95a5a6;">No comments</h4>
             </div>
 
-            <Comment v-for="comment in comments" :key="comment.id" :comment="comment"></Comment>
+            <Comment v-for="comment in comments" :key="comment.id" :comment="comment" :hide-expand="true"></Comment>
           </div>
           <button
             @click="closeTooltip"
@@ -157,6 +157,10 @@ export default {
   .card-content .text-content {
     padding: 1.5rem;
   }
+
+  .top-comments-body {
+    margin-left: -8px;
+  }
 }
 
 @media screen and (min-width: 769px) {
@@ -164,6 +168,11 @@ export default {
     max-width: 700px;
     margin: 25px auto;
   }
+}
+
+.top-comments-body {
+  padding-top: 10px;
+  padding-right: 10px;
 }
 
 .card-header a {

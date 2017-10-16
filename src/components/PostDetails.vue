@@ -5,10 +5,12 @@
         <rotate-loader></rotate-loader>
       </div>
 
-      <div v-else>
+      <div ref="contentStart"></div>
+
+      <div v-if="!isPostLoading">
         <component :is="postPack.component" v-bind="postPack"></component>
-        <div class="container" style="max-width: 700px; margin-bottom: 100px;">
-          <Comment v-for="comment in comments" :key="comment.id" :comment="comment"></Comment>
+        <div class="container" style="max-width: 1200px; margin-bottom: 100px;">
+          <Comment v-for="comment in comments" :key="comment.id" :show-replies="true" :comment="comment" :is-root="true"></Comment>
         </div>
       </div>
     </div>
