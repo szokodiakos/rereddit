@@ -26,12 +26,11 @@ export default {
   },
   created() {
     const domain = this.post.domain;
-    let url = this.post.url;
-    const isImgurAlbum = url.startsWith('https://imgur.com/a/');
+    const isImgurAlbum = this.url.startsWith('https://imgur.com/a/');
     if (isImgurAlbum) {
-      url = _.get(this.post, 'media.oembed.thumbnail_url', '').replace('?fb', '');
+      this.url = _.get(this.post, 'media.oembed.thumbnail_url', '').replace('?fb', '');
     } else if (domain === 'imgur.com') {
-      url = `${url.replace('imgur.com', 'i.imgur.com')}.jpg`;
+      this.url = `${this.url.replace('imgur.com', 'i.imgur.com')}.jpg`;
     }
     const image = new Image();
     image.src = this.url;
