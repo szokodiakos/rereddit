@@ -2,6 +2,9 @@
   <section class="hero is-primary is-bold jump-target">
     <div class="hero-body heading-body" v-bind:style="{
       'background-image': `-webkit-linear-gradient(left, ${color}, rgba(0,0,0,0))${bannerImg ? `, url(${bannerImg})` : ''}`,
+      'background-size': 'cover',
+      'background-position': 'center center',
+      'background-repeat': 'no-repeat'
     }">
       <div v-if="subreddit" class="go-to-frontpage-button">
         <router-link
