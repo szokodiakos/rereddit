@@ -4,6 +4,7 @@
       <video class="center full-width" preload="auto" autoplay muted loop webkit-playsinline playsinline>
         <source :src="url" type="video/mp4"></source>
       </video>
+      <br class="hide-on-desktop">
     </div>
   </Post>
 </template>

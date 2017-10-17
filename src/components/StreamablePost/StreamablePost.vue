@@ -9,6 +9,7 @@
         allowfullscreen
         style="max-width: 100%;display: flex;justify-content: center;"
       ></iframe>
+      <br class="hide-on-desktop">
     </div>
   </Post>
 </template>

@@ -10,13 +10,10 @@
         </h2>
       </div>
 
-      <component
-        v-for="postPack in posts"
-        :key="postPack.post.id"
-        :is="postPack.component"
-        v-bind="postPack"
-      >
-      </component>
+      <div v-for="postPack in posts" :key="postPack.post.id">
+        <component :is="postPack.component" v-bind="postPack"></component>
+      </div>
+
 
       <infinite-loading v-if="lastPostId" class="infinite-loader" @infinite="infiniteHandler">
         <span slot="spinner">

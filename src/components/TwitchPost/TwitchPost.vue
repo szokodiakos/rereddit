@@ -10,6 +10,7 @@
         scrolling="no"
         allowfullscreen="true"
       ></iframe>
+      <br class="hide-on-desktop">
     </div>
   </Post>
 </template>

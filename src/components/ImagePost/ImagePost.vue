@@ -2,6 +2,7 @@
   <Post v-bind="$props" :is-loading="isLoading">
     <div slot="content">
       <a target="_blank" :href="clickUrl"><img class="center full-width" :src="url"></img></a>
+      <br class="hide-on-desktop">
     </div>
   </Post>
 </template>

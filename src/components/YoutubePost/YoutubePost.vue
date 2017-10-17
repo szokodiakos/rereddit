@@ -9,6 +9,7 @@
         frameborder="0"
         allowfullscreen
       ></iframe>
+      <br class="hide-on-desktop">
     </div>
   </Post>
 </template>
