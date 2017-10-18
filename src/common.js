@@ -8,6 +8,7 @@ import SelfPost from '@/components/SelfPost';
 import TwitchPost from '@/components/TwitchPost';
 import StreamablePost from '@/components/StreamablePost';
 import GfycatPost from '@/components/GfycatPost';
+import VimeoPost from '@/components/VimeoPost';
 
 const postComponentsArray = [
   ImagePost,
@@ -17,6 +18,7 @@ const postComponentsArray = [
   TwitchPost,
   StreamablePost,
   GfycatPost,
+  VimeoPost,
 ];
 postComponentsArray.push(OtherPost);
 
