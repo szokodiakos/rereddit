@@ -41,6 +41,7 @@ export default {
   .post-title {
     padding: 0.7rem !important;
     line-height: 0.8;
+    margin-bottom: 0px !important;
   }
 
   .post-title a {
@@ -61,7 +62,7 @@ export default {
 }
 
 .nsfw {
-  color: white;
+  color: white !important;
 }
 
 .sticky {

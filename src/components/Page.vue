@@ -8,6 +8,7 @@
     </div>
     <div v-else>
       <Heading
+        :is-compact="isCompactHeading"
         :color="subredditData.color"
         :banner-img="subredditData.bannerImg"
         :header-img="subredditData.headerImg"
@@ -45,6 +46,7 @@ export default {
   name: 'page',
   props: [
     'subreddit',
+    'isCompactHeading',
   ],
   methods: {
     jumpToTop() {
@@ -64,7 +66,7 @@ export default {
           iconImg: subredditDataRaw.icon_img,
           color: subredditDataRaw.key_color || common.DEFAULT_COLOR,
         };
-        subredditData.textColor = common.getTextColor(this.subredditData.color);
+        subredditData.textColor = common.getTextColor(subredditData.color);
       } else {
         subredditData = DEFAULT_SUBREDDIT_DATA;
       }

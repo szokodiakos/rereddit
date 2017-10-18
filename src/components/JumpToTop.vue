@@ -1,7 +1,7 @@
 <template>
-  <a class="button is-large the" @click="click" v-bind:style="{ backgroundColor }">
+  <a class="button is-large the" @click="click" :style="{ backgroundColor }">
     <span class="icon is-large">
-      <i class="fa fa-chevron-up" v-bind:style="{ color }"></i>
+      <i class="fa fa-chevron-up" :style="{ color }"></i>
     </span>
   </a>
 </template>

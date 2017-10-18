@@ -1,7 +1,7 @@
 <template>
   <Post v-bind="$props" :is-loading="isLoading">
     <div slot="content">
-      <p class="text-content"><vue-markdown v-bind:source="details"></vue-markdown></p>
+      <p class="text-content"><vue-markdown :source="details"></vue-markdown></p>
     </div>
   </Post>
 </template>

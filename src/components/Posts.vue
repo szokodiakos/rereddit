@@ -1,5 +1,5 @@
 <template>
-  <div v-bind:style="{ 'text-align': isPostsLoading ? 'center' : 'left' }">
+  <div :style="{ 'text-align': isPostsLoading ? 'center' : 'left' }">
     <div v-if="isPostsLoading" class="post-loader">
       <rotate-loader></rotate-loader>
     </div>

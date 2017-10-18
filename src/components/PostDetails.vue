@@ -1,5 +1,5 @@
 <template>
-  <Page :subreddit="subreddit">
+  <Page :subreddit="subreddit" :is-compact-heading="true">
     <div slot="content">
       <div v-if="isPostLoading" class="post-loader">
         <rotate-loader></rotate-loader>

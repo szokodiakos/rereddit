@@ -1,10 +1,10 @@
 <template>
   <div class="tabs is-centered">
     <ul>
-      <li v-for="tab in tabs" :key="tab.name" v-bind:class="{ 'is-active': isActiveTab(tab.modifier) }">
+      <li v-for="tab in tabs" :key="tab.name" :class="{ 'is-active': isActiveTab(tab.modifier) }">
         <router-link :to="getRouteLink(tab.modifier)" class="tab-item">
           <i :class="`fa fa-${tab.icon}`"></i>
-          <span v-bind:class="{ 'hide-on-mobile': !isActiveTab(tab.modifier) }">&nbsp;{{ tab.name }}</span>
+          <span :class="{ 'hide-on-mobile': !isActiveTab(tab.modifier) }">&nbsp;{{ tab.name }}</span>
         </router-link>
       </li>
     </ul>

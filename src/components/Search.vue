@@ -1,7 +1,7 @@
 <template>
   <div class="field has-addons" style="justify-content: center;">
     <div class="control">
-      <a class="button is-static go-to-button" v-bind:style="{ 'background-color': color, color: textColor }">
+      <a class="button is-static go-to-button" :style="{ 'background-color': color, color: textColor }">
         Go to /r/
       </a>
     </div>
@@ -24,7 +24,7 @@
           :key="result.name"
           @click="openSubreddit(result)"
           @mouseover="resultMouseover(result)"
-          v-bind:style="{
+          :style="{
             'background-color': isActive(result, results[0]) ? color : 'white',
             color: isActive(result, results[0]) ? textColor: '#363636',
           }"

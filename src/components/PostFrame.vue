@@ -1,7 +1,7 @@
 <template>
   <div class="card post">
-    <header v-if="!isPostRoute" class="card-header" v-bind:style="{ 'background-color': color }">
-      <p class="card-header-title no-wrap" v-bind:style="{ 'color': textColor, overflow: 'auto' }">
+    <header class="card-header" :style="{ 'background-color': color }">
+      <p class="card-header-title no-wrap" :style="{ 'color': textColor, overflow: 'auto' }">
         <router-link :to="`/${subreddit}`">{{ subreddit }}</router-link>
         &nbsp;&middot;
         {{ date }}
@@ -87,11 +87,6 @@ function isCommentValid(comment) {
 
 export default {
   name: 'postFrame',
-  computed: {
-    isPostRoute() {
-      return this.$route.name === 'post';
-    },
-  },
   data() {
     return {
       areCommentsLoading: false,
