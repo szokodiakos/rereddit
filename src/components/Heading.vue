@@ -9,9 +9,9 @@
       height: '50px',
       display: 'flex',
       'flex-direction': 'row',
-      'justify-content': 'center'
+      'justify-content': 'flex-start'
     }">
-      <div v-if="subreddit" class="compact-go-to-frontpage-button" style="align-self: center; margin-right: auto; margin-left: 5px;">
+      <div v-if="subreddit" class="compact-go-to-frontpage-button" style="align-self: center; margin-left: 5px;">
         <router-link
           to="/"
           class="button"
@@ -23,13 +23,10 @@
         </router-link>
       </div>
 
-      <div v-if="subreddit" :style="{ color: textColor, display: 'flex', 'align-items': 'center' }">
+      <div v-if="subreddit" :style="{ color: textColor, display: 'flex', 'align-items': 'center', 'margin-left': '10px' }">
         <router-link :to="subreddit" :style="{ color: textColor, 'white-space': 'nowrap' }">
           <strong>{{ subreddit }}</strong>
         </router-link>
-      </div>
-      <div v-else :style="{ color: textColor }">
-        Rereddit
       </div>
 
       <div v-if="headerImg" style="margin-left: auto; margin-right: 5px; width: 45px; height: 45px; position: relative;">
