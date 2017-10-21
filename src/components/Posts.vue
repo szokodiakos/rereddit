@@ -63,13 +63,11 @@ export default {
         this.resetPosts();
         this.initPosts(await this.getPosts());
         this.isPostsLoading = false;
-      } else if (this.scrollY) {
-        this.$nextTick(() => window.scrollTo(0, this.scrollY));
       }
     },
   },
   methods: {
-    ...mapMutations(['initPosts', 'resetPosts', 'appendPosts', 'scrollY']),
+    ...mapMutations(['initPosts', 'resetPosts', 'appendPosts']),
     getColorByPost({ subreddit_name_prefixed: subreddit }) {
       return this.colors[subreddit].color;
     },
