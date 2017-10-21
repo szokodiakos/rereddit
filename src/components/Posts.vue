@@ -27,6 +27,7 @@
 <script>
 import RotateLoader from 'vue-spinner/src/RotateLoader';
 import _ from 'lodash';
+import { mapMutations, mapState } from 'vuex';
 import InfiniteLoading from 'vue-infinite-loading';
 import common, { postComponents } from '@/common';
 import Post from '@/components/Post';
@@ -36,9 +37,7 @@ export default {
   data() {
     return {
       colors: {},
-      posts: [],
       isPostsLoading: true,
-      lastPostId: '',
     };
   },
   props: [
@@ -46,23 +45,31 @@ export default {
     'modifier',
   ],
   computed: {
+    ...mapState(['posts', 'lastPostId']),
     show() {
       return this.$route.query.show;
     },
   },
   async created() {
-    this.posts = await this.getPosts();
+    if (_.isEmpty(this.posts)) {
+      this.initPosts(await this.getPosts());
+    }
     this.isPostsLoading = false;
   },
   watch: {
-    async $route() {
-      this.isPostsLoading = true;
-      this.posts = [];
-      this.posts = await this.getPosts();
-      this.isPostsLoading = false;
+    async $route(to, from) {
+      if (from.name !== 'post') {
+        this.isPostsLoading = true;
+        this.resetPosts();
+        this.initPosts(await this.getPosts());
+        this.isPostsLoading = false;
+      } else if (this.scrollY) {
+        this.$nextTick(() => window.scrollTo(0, this.scrollY));
+      }
     },
   },
   methods: {
+    ...mapMutations(['initPosts', 'resetPosts', 'appendPosts', 'scrollY']),
     getColorByPost({ subreddit_name_prefixed: subreddit }) {
       return this.colors[subreddit].color;
     },
@@ -99,7 +106,7 @@ export default {
       // prefetch subreddits
       await Promise.all(subreddits.map(subreddit => this.populateColorBySubreddit(subreddit)));
 
-      this.lastPostId = _.get(posts, `[${posts.length - 1}].id`);
+      const lastPostId = _.get(posts, `[${posts.length - 1}].id`);
 
       const postPacks = posts.map(post => ({
         post,
@@ -108,14 +115,15 @@ export default {
         component: common.handles(post),
       }));
 
-      return postPacks;
+      return { posts: postPacks, lastPostId };
     },
     async infiniteHandler($state) {
       if (!this.lastPostId) {
         $state.loaded();
         return;
       }
-      this.posts = [...this.posts, ...await this.getPosts({ after: this.lastPostId })];
+
+      this.appendPosts((await this.getPosts({ after: this.lastPostId })));
       $state.loaded();
     },
   },

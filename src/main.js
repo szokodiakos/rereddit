@@ -8,6 +8,7 @@ import 'buefy/lib/buefy.min.css';
 import 'font-awesome/css/font-awesome.min.css';
 import router from './router';
 import App from './App';
+import store from './store';
 
 moment.updateLocale('en', {
   relativeTime: {
@@ -43,6 +44,7 @@ Vue.use(VueAnalytics, {
 new Vue({
   el: '#app',
   router,
+  store,
   template: '<App/>',
   components: { App },
 });

@@ -35,6 +35,8 @@ module.exports = {
     }],
     // allow debugger during development
     'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0,
-    'max-len': ['error', 120]
+    'max-len': ['error', 120],
+    'no-param-reassign': ['error', { 'props': false }],
+    'no-plusplus': 0
   }
 }
