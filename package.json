@@ -24,6 +24,7 @@
     "lodash": "^4.17.4",
     "moment": "^2.18.1",
     "numeral": "^2.0.6",
+    "scroll-restoration-polyfill": "^0.6.1",
     "tippy.js": "^1.2.2",
     "typed.js": "^2.0.6",
     "vue": "^2.4.2",

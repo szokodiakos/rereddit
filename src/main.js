@@ -6,9 +6,12 @@ import Buefy from 'buefy';
 import moment from 'moment';
 import 'buefy/lib/buefy.min.css';
 import 'font-awesome/css/font-awesome.min.css';
+import 'scroll-restoration-polyfill';
 import router from './router';
 import App from './App';
 import store from './store';
+
+history.scrollRestoration = 'manual';
 
 moment.updateLocale('en', {
   relativeTime: {
