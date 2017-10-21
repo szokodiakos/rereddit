@@ -5,11 +5,14 @@
         <rotate-loader></rotate-loader>
       </div>
 
-      <div ref="contentStart"></div>
-
-      <div v-if="!isPostLoading">
+      <div v-else>
         <component :is="postPack.component" v-bind="postPack"></component>
-        <div class="container" style="max-width: 1200px; margin-bottom: 100px;">
+
+        <div v-if="isCommentsLoading" class="post-loader">
+          <rotate-loader></rotate-loader>
+        </div>
+
+        <div v-else class="container" style="max-width: 1200px; margin-bottom: 100px;">
           <Comment v-for="comment in comments" :key="comment.id" :show-replies="true" :comment="comment" :is-root="true"></Comment>
         </div>
       </div>
@@ -29,6 +32,7 @@ export default {
   data() {
     return {
       isPostLoading: true,
+      isCommentsLoading: true,
       postPack: null,
       comments: [],
     };
@@ -52,6 +56,7 @@ export default {
     };
 
     this.isPostLoading = false;
+    this.isCommentsLoading = false;
   },
   computed: {
     subreddit() {
