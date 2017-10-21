@@ -1,6 +1,6 @@
 <template>
   <p class="title post-title">
-    <router-link :to="permalink">
+    <router-link :to="permalink" @click.native="saveScrollId(id)">
       <b-icon
         v-if="isSticky"
         size="is-medium"
@@ -17,14 +17,19 @@
 
 <script>
 import he from 'he';
+import { mapMutations } from 'vuex';
 
 export default {
   name: 'postTitle',
   props: [
     'post',
   ],
+  methods: {
+    ...mapMutations(['saveScrollId']),
+  },
   data() {
     return {
+      id: this.post.id,
       url: this.post.url,
       isSticky: this.post.stickied,
       isNsfw: this.post.over_18,

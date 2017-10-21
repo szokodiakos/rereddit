@@ -10,10 +10,9 @@
         </h2>
       </div>
 
-      <div v-for="postPack in posts" :key="postPack.post.id">
+      <div v-for="postPack in posts" :class="`post-${postPack.post.id}`" :key="postPack.post.id">
         <component :is="postPack.component" v-bind="postPack"></component>
       </div>
-
 
       <infinite-loading v-if="lastPostId" class="infinite-loader" @infinite="infiniteHandler">
         <span slot="spinner">
@@ -45,7 +44,7 @@ export default {
     'modifier',
   ],
   computed: {
-    ...mapState(['posts', 'lastPostId']),
+    ...mapState(['posts', 'lastPostId', 'scrollId']),
     show() {
       return this.$route.query.show;
     },
@@ -53,6 +52,8 @@ export default {
   async created() {
     if (_.isEmpty(this.posts)) {
       this.initPosts(await this.getPosts());
+    } else if (this.scrollId) {
+      this.$nextTick(() => setTimeout(() => document.querySelector(`.post-${this.scrollId}`).scrollIntoView(), 100));
     }
     this.isPostsLoading = false;
   },

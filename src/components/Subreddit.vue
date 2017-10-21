@@ -13,7 +13,6 @@
 </template>
 
 <script>
-import { mapMutations } from 'vuex';
 import modifiers from '@/enums/modifiers';
 import Page from '@/components/Page';
 import ModifierDropdown from '@/components/ModifierDropdown';
@@ -22,10 +21,6 @@ import Posts from '@/components/Posts';
 
 export default {
   name: 'subreddit',
-  beforeRouteLeave(to, from, next) {
-    this.saveScrollY(window.pageYOffset);
-    next();
-  },
   created() {
     this.setTitle();
   },
@@ -43,7 +38,6 @@ export default {
     },
   },
   methods: {
-    ...mapMutations(['saveScrollY']),
     setTitle() {
       if (this.subreddit) {
         document.title = `${this.subreddit} - Rereddit`;
