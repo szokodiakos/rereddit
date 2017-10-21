@@ -10,7 +10,7 @@
       display: 'flex',
       'flex-direction': 'row',
       'justify-content': 'flex-start'
-    }">
+    }" class="jump-target">
       <div v-if="subreddit" class="compact-go-to-frontpage-button" style="align-self: center; margin-left: 5px;">
         <router-link
           to="/"
