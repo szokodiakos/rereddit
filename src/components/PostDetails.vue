@@ -38,6 +38,7 @@ export default {
     };
   },
   async created() {
+    window.scrollTo(0, 0);
     const permalink = this.$route.path;
     const response = await this.$http.get(`https://www.reddit.com${permalink}.json`);
     const subredditResponse = await this.$http.get(`https://www.reddit.com/${this.subreddit}/about.json`);
