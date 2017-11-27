@@ -1,5 +1,5 @@
 <template>
-  <p class="title post-title">
+  <p :class="['title post-title', { 'text-color-for-dark': isDarkModeOn }]">
     <router-link :to="permalink" @click.native="saveScrollId(id)">
       <b-icon
         v-if="isSticky"
@@ -17,13 +17,16 @@
 
 <script>
 import he from 'he';
-import { mapMutations } from 'vuex';
+import { mapMutations, mapGetters } from 'vuex';
 
 export default {
   name: 'postTitle',
   props: [
     'post',
   ],
+  computed: {
+    ...mapGetters(['isDarkModeOn']),
+  },
   methods: {
     ...mapMutations(['saveScrollId']),
   },

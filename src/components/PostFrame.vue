@@ -1,5 +1,5 @@
 <template>
-  <div class="card post">
+  <div :class="['card post', { 'dark-background': isDarkModeOn }]">
     <header class="card-header" :style="{ 'background-color': color }">
       <p class="card-header-title no-wrap" :style="{ 'color': textColor, overflow: 'auto' }">
         <router-link :to="`/${subreddit}`">{{ subreddit }}</router-link>
@@ -16,7 +16,7 @@
       </div>
     </div>
 
-    <footer class="card-footer">
+    <footer :class="['card-footer', { 'dark-borders': isDarkModeOn }]">
       <label class="card-footer-item green-color">
           <b-icon style="margin-right: 8px;" pack="fa" icon="arrow-up"></b-icon> {{ score }}
       </label>
@@ -67,6 +67,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import _ from 'lodash';
 import VueMarkdown from 'vue-markdown';
 import RotateLoader from 'vue-spinner/src/RotateLoader';
@@ -87,6 +88,9 @@ function isCommentValid(comment) {
 
 export default {
   name: 'postFrame',
+  computed: {
+    ...mapGetters(['isDarkModeOn']),
+  },
   data() {
     return {
       areCommentsLoading: false,
@@ -176,6 +180,10 @@ export default {
 
 .text-content {
   text-align: justify;
+}
+
+.dark-borders, .dark-borders label {
+  border-color: #2c3e50;
 }
 
 </style>

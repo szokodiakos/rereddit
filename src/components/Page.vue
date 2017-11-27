@@ -1,12 +1,12 @@
 <template>
-  <div>
+  <div class="page">
     <div
       v-if="isLoading"
       style="position:absolute;left:50%;top:50%;-webkit-transform:translate(-50%, -50%);transform:translate(-50%, -50%);"
     >
       <rotate-loader></rotate-loader>
     </div>
-    <div v-else>
+    <div class="loaded-page" v-else :class="{ 'black-background': isDarkModeOn }">
       <Heading
         :is-compact="isCompactHeading"
         :color="subredditData.color"
@@ -31,6 +31,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import RotateLoader from 'vue-spinner/src/RotateLoader';
 import jump from 'jump.js';
 import JumpToTop from '@/components/JumpToTop';
@@ -48,6 +49,9 @@ export default {
     'subreddit',
     'isCompactHeading',
   ],
+  computed: {
+    ...mapGetters(['isDarkModeOn']),
+  },
   methods: {
     jumpToTop() {
       jump('.jump-target');
@@ -66,10 +70,12 @@ export default {
           iconImg: subredditDataRaw.icon_img,
           color: subredditDataRaw.key_color || common.DEFAULT_COLOR,
         };
+
         subredditData.textColor = common.getTextColor(subredditData.color);
       } else {
         subredditData = DEFAULT_SUBREDDIT_DATA;
       }
+
       return subredditData;
     },
   },
@@ -100,5 +106,9 @@ export default {
   },
 };
 </script>
-
+<style>
+.page, .loaded-page {
+  height: 100%;
+}
+</style>
 

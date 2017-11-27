@@ -1,8 +1,8 @@
 <template>
   <div class="tabs is-centered">
-    <ul>
+    <ul :class="{ 'dark-borders': isDarkModeOn }">
       <li v-for="tab in tabs" :key="tab.name" :class="{ 'is-active': isActiveTab(tab.modifier) }">
-        <router-link :to="getRouteLink(tab.modifier)" class="tab-item">
+        <router-link :to="getRouteLink(tab.modifier)" :class="['tab-item', { 'dark-borders': isDarkModeOn }]">
           <i :class="`fa fa-${tab.icon}`"></i>
           <span :class="{ 'hide-on-mobile': !isActiveTab(tab.modifier) }">&nbsp;{{ tab.name }}</span>
         </router-link>
@@ -12,6 +12,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import modifiers from '@/enums/modifiers';
 
 export default {
@@ -50,6 +51,9 @@ export default {
   created() {
     this.currentModifier = this.$route.params.modifier;
   },
+  computed: {
+    ...mapGetters(['isDarkModeOn']),
+  },
   methods: {
     getRouteLink(tabModifier = '') {
       const currentModifier = this.currentModifier;
@@ -85,5 +89,9 @@ export default {
 <style scoped>
 .tab-item {
   height: 41px;
+}
+
+.dark-borders {
+  border-color: black;
 }
 </style>

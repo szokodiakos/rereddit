@@ -11,6 +11,10 @@ export default {
 </script>
 
 <style>
+html, body, #app, #app > div {
+  height: 100%;
+}
+
 @media screen and (min-width: 769px) {
   .hide-on-desktop {
     display: none !important;
@@ -64,6 +68,18 @@ export default {
 
 .gold-color {
   color: #ffd700 !important;
+}
+
+.black-background {
+  background-color: black;
+}
+
+.dark-background {
+  background-color: #191919;
+}
+
+.text-color-for-dark, .text-color-for-dark a {
+  color: rgb(155, 155, 155);
 }
 </style>
 

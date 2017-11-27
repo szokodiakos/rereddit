@@ -3,7 +3,7 @@
     <div v-if="isPostsLoading" class="post-loader">
       <rotate-loader></rotate-loader>
     </div>
-    <div v-else>
+    <div v-else :class="{ 'black-background': isDarkModeOn }">
       <div v-if="!posts.length" class="no-posts-message">
         <h2 class="title is-2">
           No posts <b-icon pack="fa" icon="frown-o" size="is-large"></b-icon>
@@ -24,9 +24,10 @@
 </template>
 
 <script>
+import chroma from 'chroma-js';
 import RotateLoader from 'vue-spinner/src/RotateLoader';
 import _ from 'lodash';
-import { mapMutations, mapState } from 'vuex';
+import { mapMutations, mapState, mapGetters } from 'vuex';
 import InfiniteLoading from 'vue-infinite-loading';
 import common, { postComponents } from '@/common';
 import Post from '@/components/Post';
@@ -44,6 +45,7 @@ export default {
     'modifier',
   ],
   computed: {
+    ...mapGetters(['isDarkModeOn']),
     ...mapState(['posts', 'lastPostId', 'scrollId']),
     show() {
       return this.$route.query.show;
@@ -78,11 +80,15 @@ export default {
     async populateColorBySubreddit(subreddit) {
       if (!this.colors[subreddit]) {
         const response = await this.$http.get(`https://www.reddit.com/${subreddit}/about.json`);
-        const color = _.get(response, 'body.data.key_color') || common.DEFAULT_COLOR;
-        this.colors[subreddit] = {
-          color,
-          textColor: common.getTextColor(color),
-        };
+        let color = _.get(response, 'body.data.key_color') || common.DEFAULT_COLOR;
+        let textColor = common.getTextColor(color);
+
+        if (this.isDarkModeOn) {
+          color = chroma(color).darken(2).hex();
+          textColor = chroma(textColor).darken(2).hex();
+        }
+
+        this.colors[subreddit] = { color, textColor };
       }
     },
     async getPosts({ after } = {}) {
