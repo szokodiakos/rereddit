@@ -62,6 +62,10 @@ export default {
   color: inherit;
 }
 
+.post-title {
+  text-align: justify;
+}
+
 .tag {
   text-transform: uppercase;
 }
