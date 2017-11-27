@@ -23,6 +23,10 @@ export default {
   }
 }
 
+.screen-height-max {
+  max-height: 100vh;
+}
+
 .tippy-tooltip.light-theme {
   min-height: 200px;
   width: 680px;
