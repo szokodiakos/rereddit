@@ -27,7 +27,7 @@ export default {
   },
   created() {
     const domain = this.post.domain;
-    const isImgurAlbum = this.url.startsWith('https://imgur.com/a/');
+    const isImgurAlbum = this.url.includes('imgur.com/a/');
     if (isImgurAlbum) {
       this.url = _.get(this.post, 'media.oembed.thumbnail_url', '').replace('?fb', '');
     } else if (domain === 'imgur.com') {
