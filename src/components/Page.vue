@@ -6,7 +6,7 @@
     >
       <rotate-loader></rotate-loader>
     </div>
-    <div v-else :class="['full-vh', { 'black-background': isDarkModeOn }]">
+    <div v-else :class="{ 'black-background': isDarkModeOn }">
       <Heading
         :is-compact="isCompactHeading"
         :color="subredditData.color"
@@ -106,8 +106,3 @@ export default {
   },
 };
 </script>
-<style scoped>
-.full-vh {
-  height: 100vh;
-}
-</style>
