@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div :class="`card ${isRoot ? '' : 'non-root'}`" style="margin-bottom: 8px;">
+    <div :class="[`card ${isRoot ? '' : 'non-root'}`, { 'dark-background': isDarkModeOn, 'dark-box-shadow': isDarkModeOn }]" style="margin-bottom: 8px;">
       <div class="card-content" style="overflow: auto;">
         <div @click="expandCollapse" style="text-align: left;">
           <a v-if="!hideExpand">
@@ -30,6 +30,7 @@
 
 <script>
 import he from 'he';
+import { mapGetters } from 'vuex';
 import _ from 'lodash';
 import common from '@/common';
 
@@ -41,6 +42,9 @@ export default {
     'isRoot',
     'hideExpand',
   ],
+  computed: {
+    ...mapGetters(['isDarkModeOn']),
+  },
   methods: {
     expandCollapse() {
       if (!this.hideExpand) {
@@ -76,6 +80,10 @@ export default {
   padding-bottom: 10px;
   padding-left: 10px;
   padding-right: 10px;
+}
+
+.dark-box-shadow {
+  box-shadow: 0 2px 3px #2c3e50, 0 0 0 1px #2c3e50;
 }
 
 @media screen and (min-width: 769px) {

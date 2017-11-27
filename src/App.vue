@@ -11,9 +11,6 @@ export default {
 </script>
 
 <style>
-html, body, #app, #app > div {
-  height: 100%;
-}
 
 @media screen and (min-width: 769px) {
   .hide-on-desktop {
@@ -76,6 +73,10 @@ html, body, #app, #app > div {
 
 .dark-background {
   background-color: #191919;
+}
+
+.darkish-background {
+  background-color: #2b2b2b;
 }
 
 .text-color-for-dark, .text-color-for-dark a {

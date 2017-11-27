@@ -5,7 +5,7 @@
         <rotate-loader></rotate-loader>
       </div>
 
-      <div v-else>
+      <div v-else :class="{ 'black-background': isDarkModeOn }">
         <component :is="postPack.component" v-bind="postPack"></component>
 
         <div v-if="isCommentsLoading" class="post-loader">
@@ -22,6 +22,8 @@
 
 <script>
 import _ from 'lodash';
+import chroma from 'chroma-js';
+import { mapGetters } from 'vuex';
 import Page from '@/components/Page';
 import Comment from '@/components/Comment';
 import RotateLoader from 'vue-spinner/src/RotateLoader';
@@ -42,8 +44,14 @@ export default {
     const permalink = this.$route.path;
     const response = await this.$http.get(`https://www.reddit.com${permalink}.json`);
     const subredditResponse = await this.$http.get(`https://www.reddit.com/${this.subreddit}/about.json`);
-    const color = _.get(subredditResponse, 'body.data.key_color') || common.DEFAULT_COLOR;
-    const textColor = common.getTextColor(color);
+    let color = _.get(subredditResponse, 'body.data.key_color') || common.DEFAULT_COLOR;
+    let textColor = common.getTextColor(color);
+
+    if (this.isDarkModeOn) {
+      color = chroma(color).darken(2).hex();
+      textColor = chroma(textColor).darken(2).hex();
+    }
+
     const post = _.get(response, 'body[0].data.children[0].data', {});
     this.comments = _.get(response, 'body[1].data.children', [])
       .filter(({ kind }) => kind !== 'more')
@@ -60,6 +68,7 @@ export default {
     this.isCommentsLoading = false;
   },
   computed: {
+    ...mapGetters(['isDarkModeOn']),
     subreddit() {
       return this.$route.params.subreddit ? `/r/${this.$route.params.subreddit}` : '';
     },

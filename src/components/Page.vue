@@ -1,12 +1,12 @@
 <template>
-  <div class="page">
+  <div>
     <div
       v-if="isLoading"
       style="position:absolute;left:50%;top:50%;-webkit-transform:translate(-50%, -50%);transform:translate(-50%, -50%);"
     >
       <rotate-loader></rotate-loader>
     </div>
-    <div class="loaded-page" v-else :class="{ 'black-background': isDarkModeOn }">
+    <div v-else :class="['full-vh', { 'black-background': isDarkModeOn }]">
       <Heading
         :is-compact="isCompactHeading"
         :color="subredditData.color"
@@ -106,9 +106,8 @@ export default {
   },
 };
 </script>
-<style>
-.page, .loaded-page {
-  height: 100%;
+<style scoped>
+.full-vh {
+  height: 100vh;
 }
 </style>
-

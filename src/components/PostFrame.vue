@@ -21,7 +21,8 @@
           <b-icon style="margin-right: 8px;" pack="fa" icon="arrow-up"></b-icon> {{ score }}
       </label>
       <a @mouseover="loadTopComments(permalink)" ref="tippy" v-tippy="{
-        theme: 'light',
+        maxWidth: '700px',
+        theme: isDarkModeOn ? 'dark' : 'light',
         arrow: true,
         interactive: true,
         size: 'small',
@@ -36,7 +37,7 @@
         }
       }" class="card-footer-item" :data-html="`#tooltip-content-${id}`">
         <div :id="`tooltip-content-${id}`" style="display:none">
-          <strong>
+          <strong :class="{ 'text-color-for-dark' : isDarkModeOn }">
             <b-icon pack="fa" icon="trophy" size="is-small" style="margin-bottom: 4px;"></b-icon> Top Comments
           </strong>
           <div v-if="areCommentsLoading">
