@@ -12,15 +12,15 @@
       'justify-content': 'flex-start'
     }" class="jump-target">
       <div v-if="subreddit" class="compact-go-to-frontpage-button" style="align-self: center; margin-left: 5px;">
-        <router-link
-          to="/"
+        <a
+          @click="goToFrontPage()"
           class="button"
           :style="{ color: textColor, 'border-color': textColor }"
           v-tippy="{ position: 'right' }"
           title="Go to Front Page"
         >
           Re&nbsp;<i class="fa fa-reddit-alien" aria-hidden="true"></i>
-        </router-link>
+        </a>
       </div>
 
       <div v-if="subreddit" :style="{ color: textColor, display: 'flex', 'align-items': 'center', 'margin-left': '10px' }">
@@ -97,6 +97,7 @@
 </template>
 
 <script>
+import { mapMutations } from 'vuex';
 import Search from '@/components/Search';
 
 export default {
@@ -112,6 +113,13 @@ export default {
     'totalUsers',
     'isCompact',
   ],
+  methods: {
+    ...mapMutations(['resetPosts']),
+    goToFrontPage() {
+      this.resetPosts();
+      this.$router.push('/');
+    },
+  },
   components: {
     Search,
   },
