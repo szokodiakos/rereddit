@@ -24,8 +24,12 @@ export default {
   }
 }
 
-.screen-height-max {
+.full-screen-height-max {
   max-height: 100vh;
+}
+
+.full-screen-height {
+  height: 100vh;
 }
 
 .tippy-tooltip.light-theme {

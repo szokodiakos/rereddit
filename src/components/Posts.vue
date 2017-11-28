@@ -1,6 +1,6 @@
 <template>
   <div :style="{ 'text-align': isPostsLoading ? 'center' : 'left' }">
-    <div v-if="isPostsLoading" class="post-loader">
+    <div v-if="isPostsLoading" :class="['post-loader full-screen-height', { 'black-background': isDarkModeOn }]">
       <rotate-loader></rotate-loader>
     </div>
     <div v-else :class="{ 'black-background': isDarkModeOn }">

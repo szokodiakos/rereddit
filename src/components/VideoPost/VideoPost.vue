@@ -1,7 +1,7 @@
 <template>
   <Post v-bind="$props">
     <div slot="content">
-      <video class="center full-width screen-height-max" preload="auto" autoplay muted loop webkit-playsinline playsinline>
+      <video class="center full-width full-screen-height-max" preload="auto" autoplay muted loop webkit-playsinline playsinline>
         <source :src="url" type="video/mp4"></source>
       </video>
       <br class="hide-on-desktop">

@@ -1,7 +1,7 @@
 <template>
   <Page :subreddit="subreddit" :is-compact-heading="true">
     <div slot="content">
-      <div v-if="isPostLoading" class="post-loader">
+      <div v-if="isPostLoading" :class="['post-loader full-screen-height', { 'black-background': isDarkModeOn }]">
         <rotate-loader></rotate-loader>
       </div>
 
