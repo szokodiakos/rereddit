@@ -7,22 +7,22 @@ Vue.use(Vuex);
 
 const persistedState = createPersistedState({
   key: 'rereddit',
-  paths: ['options'],
+  paths: ['settings'],
 });
 
 export default new Vuex.Store({
   plugins: [persistedState],
   getters: {
     isDarkModeOn: (state) => {
-      if (state.options.darkMode === DARK_MODE_STATES.AUTO) {
+      if (state.settings.darkMode === DARK_MODE_STATES.AUTO) {
         const currentHour = new Date().getHours();
         return currentHour <= 7 || currentHour >= 19;
       }
-      return state.options.darkMode === DARK_MODE_STATES.ON;
+      return state.settings.darkMode === DARK_MODE_STATES.ON;
     },
   },
   state: {
-    options: {
+    settings: {
       darkMode: DARK_MODE_STATES.AUTO,
     },
     posts: [],
@@ -30,6 +30,9 @@ export default new Vuex.Store({
     scrollId: null,
   },
   mutations: {
+    setDarkMode(state, value) {
+      state.settings.darkMode = value;
+    },
     initPosts(state, { posts, lastPostId }) {
       state.posts = posts;
       state.lastPostId = lastPostId;

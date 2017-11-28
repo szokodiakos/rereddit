@@ -1,5 +1,17 @@
 <template>
   <div>
+    <Settings ref="settings"></Settings>
+
+    <div
+      @mouseover="spinSettings = true;"
+      @mouseleave="spinSettings = false;"
+      @click="openSettings()"
+      v-tippy="{ position: 'left' }"
+      class="settings-button"
+      title="Settings">
+      <b-icon pack="fa" icon="cog" :style="{ color: textColor }" :class="{ 'fa-spin': spinSettings }"></b-icon>
+    </div>
+
     <div v-if="isCompact" :style="{
       'background-image': `-webkit-linear-gradient(left, ${color}, rgba(0,0,0,0))${bannerImg ? `, url(${bannerImg})` : ''}`,
       'background-size': 'cover',
@@ -29,12 +41,13 @@
         </router-link>
       </div>
 
-      <div v-if="headerImg" style="margin-left: auto; margin-right: 5px; width: 45px; height: 45px; position: relative;">
-        <img :src="headerImg" style="max-height: 45px; max-width: 45px; position: absolute; top: 0px; bottom: 0px; left: 0px; right 0px; margin: auto;">
+      <div v-if="headerImg" style="margin-top: auto; margin-bottom: auto; margin-left: 5px;">
+        <img :src="headerImg" style="max-height: 30px; max-width: 30px;">
       </div>
     </div>
 
     <section v-else class="hero is-primary is-bold jump-target">
+
       <div class="hero-body heading-body" :style="{
         'background-image': `-webkit-linear-gradient(left, ${color}, rgba(0,0,0,0))${bannerImg ? `, url(${bannerImg})` : ''}`,
         'background-size': 'cover',
@@ -99,6 +112,7 @@
 <script>
 import { mapMutations } from 'vuex';
 import Search from '@/components/Search';
+import Settings from '@/components/Settings';
 
 export default {
   name: 'heading',
@@ -113,15 +127,24 @@ export default {
     'totalUsers',
     'isCompact',
   ],
+  data() {
+    return {
+      spinSettings: false,
+    };
+  },
   methods: {
     ...mapMutations(['resetPosts']),
     goToFrontPage() {
       this.resetPosts();
       this.$router.push('/');
     },
+    openSettings() {
+      this.$refs.settings.open();
+    },
   },
   components: {
     Search,
+    Settings,
   },
 };
 </script>
@@ -177,5 +200,11 @@ export default {
 
 h1 {
   white-space: nowrap;
+}
+
+.settings-button {
+  position: absolute;
+  right: 8px;
+  top: 8px;
 }
 </style>
