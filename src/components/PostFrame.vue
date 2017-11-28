@@ -1,5 +1,5 @@
 <template>
-  <div :class="['card post', { 'dark-background': isDarkModeOn }]">
+  <div :class="['card post', { 'dark-background': isDarkModeOn, 'dark-box-shadow': isDarkModeOn }]">
     <header class="card-header" :style="{ 'background-color': color }">
       <p class="card-header-title no-wrap" :style="{ 'color': textColor, overflow: 'auto' }">
         <router-link :to="`/${subreddit}`">{{ subreddit }}</router-link>

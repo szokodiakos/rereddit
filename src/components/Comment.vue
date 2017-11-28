@@ -82,10 +82,6 @@ export default {
   padding-right: 10px;
 }
 
-.dark-box-shadow {
-  box-shadow: 0 2px 3px #2c3e50, 0 0 0 1px #2c3e50;
-}
-
 @media screen and (min-width: 769px) {
   .non-root {
     right: -4px;

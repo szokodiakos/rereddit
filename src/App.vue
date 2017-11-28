@@ -82,5 +82,9 @@ export default {
 .text-color-for-dark, .text-color-for-dark a {
   color: rgb(155, 155, 155);
 }
+
+.dark-box-shadow {
+  box-shadow: 0 2px 3px #2c3e50, 0 0 0 1px #2c3e50;
+}
 </style>
 
