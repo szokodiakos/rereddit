@@ -17,8 +17,8 @@
     </div>
 
     <footer :class="['card-footer', { 'dark-borders': isDarkModeOn }]">
-      <label class="card-footer-item green-color">
-          <b-icon style="margin-right: 8px;" pack="fa" icon="arrow-up"></b-icon> {{ score }}
+      <label :class="['card-footer-item', { 'green-color': isUpvoted, 'red-color': !isUpvoted }]">
+          <b-icon style="margin-right: 8px;" pack="fa" :icon="isUpvoted ? 'arrow-up': 'arrow-down'"></b-icon> {{ score }}
       </label>
       <a @mouseover="loadTopComments(permalink)" ref="tippy" v-tippy="{
         maxWidth: '700px',
@@ -91,6 +91,9 @@ export default {
   name: 'postFrame',
   computed: {
     ...mapGetters(['isDarkModeOn']),
+    isUpvoted() {
+      return this.post.score > 0;
+    },
   },
   data() {
     return {
@@ -100,7 +103,7 @@ export default {
       date: common.formatDate(this.post.created_utc),
       url: this.post.url,
       domain: this.post.domain,
-      score: common.formatNumber(this.post.score),
+      score: common.formatNumber(Math.abs(this.post.score)),
       permalink: this.post.permalink,
       id: this.post.id,
       commentCount: common.formatNumber(this.post.num_comments),
