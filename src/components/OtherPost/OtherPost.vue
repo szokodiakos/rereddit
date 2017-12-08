@@ -8,6 +8,7 @@
 <script>
 import ThumbnailPost from '@/components/ThumbnailPost';
 import Post from '@/components/Post';
+import isUrl from 'is-url';
 
 export default {
   name: 'otherPost',
@@ -15,8 +16,15 @@ export default {
     'post',
     'color',
     'textColor',
-    'thumbnail',
   ],
+  computed: {
+    thumbnail() {
+      if (!isUrl(this.post.thumbnail)) {
+        return '';
+      }
+      return this.post.thumbnail;
+    },
+  },
   components: {
     ThumbnailPost,
     Post,
