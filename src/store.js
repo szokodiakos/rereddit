@@ -24,14 +24,25 @@ export default new Vuex.Store({
   state: {
     settings: {
       darkMode: DARK_MODE_STATES.AUTO,
+      showNsfw: false,
     },
+    isSettingsOpen: false,
     posts: [],
     lastPostId: null,
     scrollId: null,
   },
   mutations: {
+    openSettings(state) {
+      state.isSettingsOpen = true;
+    },
+    closeSettings(state) {
+      state.isSettingsOpen = false;
+    },
     setDarkMode(state, value) {
       state.settings.darkMode = value;
+    },
+    setShowNsfw(state, value) {
+      state.settings.showNsfw = value;
     },
     initPosts(state, { posts, lastPostId }) {
       state.posts = posts;
@@ -48,6 +59,21 @@ export default new Vuex.Store({
     },
     saveScrollId(state, id) {
       state.scrollId = id;
+    },
+    showNsfwPostById(state, id) {
+      state.posts = state.posts.map((postObj) => {
+        if (postObj.post.id !== id) {
+          return postObj;
+        }
+        console.log('modifying');
+        return {
+          ...postObj,
+          post: {
+            ...postObj.post,
+            over_18: false,
+          },
+        };
+      });
     },
   },
 });

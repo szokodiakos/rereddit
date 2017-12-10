@@ -18,7 +18,7 @@
                 :disabled="darkModeAuto"
                 style="padding-left: 5px;"
               ></switches>
-              <div @click="clickSwitch()" style="position: absolute; top:0; bottom:0; width: 45px;" :class="{ 'in-front': darkModeAuto }"></div>
+              <div @click="clickDarkModeSwitch()" style="position: absolute; top:0; bottom:0; width: 45px;" :class="{ 'in-front': darkModeAuto }"></div>
             </span>
 
             <div class="b-checkbox is-success is-inline" style="bottom: 2px; left: 20px;">
@@ -27,6 +27,17 @@
                 Auto
               </label>
             </div>
+          </div>
+        </div>
+        <div class="field" style="margin-top: 25px;">
+          <label class="label">Show NSFW content</label>
+          <div class="control">
+            <switches
+              v-model="nsfwSwitchValue"
+              theme="bulma"
+              color="green"
+              style="padding-left: 5px;"
+            ></switches>
           </div>
         </div>
       </section>
@@ -48,33 +59,42 @@ export default {
   data() {
     const settings = this.$store.state.settings;
     return {
-      isActive: false,
       darkModeSwitchValue: settings.darkMode === DARK_MODE_STATES.ON,
       darkModeAuto: settings.darkMode === DARK_MODE_STATES.AUTO,
+      nsfwSwitchValue: settings.showNsfw,
     };
   },
+  computed: {
+    isActive() {
+      return this.$store.state.isSettingsOpen;
+    },
+  },
   methods: {
-    ...mapMutations(['setDarkMode']),
-    clickSwitch() {
+    ...mapMutations(['setDarkMode', 'setShowNsfw', 'closeSettings']),
+    clickDarkModeSwitch() {
       if (this.darkModeAuto) {
         this.darkModeAuto = false;
         this.darkModeSwitchValue = !this.darkModeSwitchValue;
       }
     },
+    saveDarkMode() {
+      if (this.darkModeAuto) {
+        this.setDarkMode(DARK_MODE_STATES.AUTO);
+      } else if (this.darkModeSwitchValue) {
+        this.setDarkMode(DARK_MODE_STATES.ON);
+      } else {
+        this.setDarkMode(DARK_MODE_STATES.OFF);
+      }
+    },
+    saveShowNsfw() {
+      this.setShowNsfw(this.nsfwSwitchValue);
+    },
     close(shouldSave) {
       if (shouldSave) {
-        if (this.darkModeAuto) {
-          this.setDarkMode(DARK_MODE_STATES.AUTO);
-        } else if (this.darkModeSwitchValue) {
-          this.setDarkMode(DARK_MODE_STATES.ON);
-        } else {
-          this.setDarkMode(DARK_MODE_STATES.OFF);
-        }
+        this.saveDarkMode();
+        this.saveShowNsfw();
       }
-      this.isActive = false;
-    },
-    open() {
-      this.isActive = true;
+      this.closeSettings();
     },
   },
   components: {

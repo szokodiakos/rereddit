@@ -133,13 +133,10 @@ export default {
     };
   },
   methods: {
-    ...mapMutations(['resetPosts']),
+    ...mapMutations(['resetPosts', 'openSettings']),
     goToFrontPage() {
       this.resetPosts();
       this.$router.push('/');
-    },
-    openSettings() {
-      this.$refs.settings.open();
     },
   },
   components: {
