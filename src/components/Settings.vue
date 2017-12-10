@@ -10,13 +10,16 @@
         <div class="field">
           <label class="label">Dark mode</label>
           <div class="control">
-            <switches
-              v-model="darkModeSwitchValue"
-              theme="bulma"
-              color="green"
-              :disabled="darkModeAuto"
-              style="padding-left: 5px;"
-            ></switches>
+            <span>
+              <switches
+                v-model="darkModeSwitchValue"
+                theme="bulma"
+                color="green"
+                :disabled="darkModeAuto"
+                style="padding-left: 5px;"
+              ></switches>
+              <div @click="clickSwitch()" style="position: absolute; top:0; bottom:0; width: 45px;" :class="{ 'in-front': darkModeAuto }"></div>
+            </span>
 
             <div class="b-checkbox is-success is-inline" style="bottom: 2px; left: 20px;">
               <input id="checkbox" class="styled" v-model="darkModeAuto" type="checkbox">
@@ -46,13 +49,19 @@ export default {
     const settings = this.$store.state.settings;
     return {
       isActive: false,
-      darkModeSwitchEnabled: settings.darkMode !== DARK_MODE_STATES.AUTO,
       darkModeSwitchValue: settings.darkMode === DARK_MODE_STATES.ON,
       darkModeAuto: settings.darkMode === DARK_MODE_STATES.AUTO,
     };
   },
   methods: {
     ...mapMutations(['setDarkMode']),
+    clickSwitch() {
+      console.log('clicked');
+      if (this.darkModeAuto) {
+        this.darkModeAuto = false;
+        this.darkModeSwitchValue = !this.darkModeSwitchValue;
+      }
+    },
     close(shouldSave) {
       if (shouldSave) {
         if (this.darkModeAuto) {
@@ -76,5 +85,7 @@ export default {
 </script>
 
 <style scoped>
-
+.in-front {
+  z-index: 10000;
+}
 </style>

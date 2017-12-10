@@ -24,7 +24,6 @@
 </template>
 
 <script>
-import chroma from 'chroma-js';
 import RotateLoader from 'vue-spinner/src/RotateLoader';
 import _ from 'lodash';
 import { mapMutations, mapState, mapGetters } from 'vuex';
@@ -80,14 +79,8 @@ export default {
     async populateColorBySubreddit(subreddit) {
       if (!this.colors[subreddit]) {
         const response = await this.$http.get(`https://www.reddit.com/${subreddit}/about.json`);
-        let color = _.get(response, 'body.data.key_color') || common.DEFAULT_COLOR;
-        let textColor = common.getTextColor(color);
-
-        if (this.isDarkModeOn) {
-          color = chroma(color).darken(2).hex();
-          textColor = chroma(textColor).darken(2).hex();
-        }
-
+        const color = _.get(response, 'body.data.key_color') || common.DEFAULT_COLOR;
+        const textColor = common.getTextColor(color);
         this.colors[subreddit] = { color, textColor };
       }
     },

@@ -25,7 +25,7 @@ export default {
 }
 
 .full-screen-height-max {
-  max-height: 100vh;
+  max-height: 80vh;
 }
 
 .full-screen-height {
