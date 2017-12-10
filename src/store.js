@@ -65,7 +65,6 @@ export default new Vuex.Store({
         if (postObj.post.id !== id) {
           return postObj;
         }
-        console.log('modifying');
         return {
           ...postObj,
           post: {
