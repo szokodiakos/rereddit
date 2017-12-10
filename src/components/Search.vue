@@ -1,7 +1,7 @@
 <template>
   <div class="field has-addons" style="justify-content: center;">
     <div class="control">
-      <a class="button is-static go-to-button" :style="{ 'background-color': color, color: textColor }">
+      <a :class="['button is-static go-to-button', { 'black-border': isDarkModeOn }]" :style="{ 'background-color': color, color: textColor }">
         Go to /r/
       </a>
     </div>
@@ -13,7 +13,11 @@
         @click="showResults();"
         @blur="startTyped();hideResults();"
         ref="subredditSearch"
-        class="input go-to-subreddit"
+        :class="['input go-to-subreddit', {
+          'black-background': isDarkModeOn,
+          'white-text': isDarkModeOn,
+          'black-border': isDarkModeOn
+        }]"
         type="text"
       >
       <ul class="options-list" @mousedown="prevent" v-show="isResultsShown">
@@ -25,8 +29,8 @@
           @click="openSubreddit(result)"
           @mouseover="resultMouseover(result)"
           :style="{
-            'background-color': isActive(result, results[0]) ? color : 'white',
-            color: isActive(result, results[0]) ? textColor: '#363636',
+            'background-color': isActive(result, results[0]) ? color : (isDarkModeOn ? 'black': 'white'),
+            color: isActive(result, results[0]) ? textColor: (isDarkModeOn ? 'white': '#363636'),
           }"
           :title="result.title"
           v-tippy="{
@@ -44,6 +48,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import _ from 'lodash';
 import Typed from 'typed.js';
 import common from '@/common';
@@ -59,6 +64,9 @@ export default {
     'color',
     'textColor',
   ],
+  computed: {
+    ...mapGetters(['isDarkModeOn']),
+  },
   async mounted() {
     const response = await this.$http.get('https://www.reddit.com/reddits/.json');
     this.subreddits = _
@@ -236,5 +244,13 @@ ul.options-list li {
 .results-list-item {
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.black-border {
+  border-color: black;
+}
+
+.white-text {
+  color: white;
 }
 </style>

@@ -56,7 +56,6 @@ export default {
   methods: {
     ...mapMutations(['setDarkMode']),
     clickSwitch() {
-      console.log('clicked');
       if (this.darkModeAuto) {
         this.darkModeAuto = false;
         this.darkModeSwitchValue = !this.darkModeSwitchValue;
