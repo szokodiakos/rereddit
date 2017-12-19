@@ -21,7 +21,11 @@
             ></b-icon>
             <span :class="{ 'green-color': isUpvoted, 'red-color': !isUpvoted }">{{ score }}</span>
           </span>
-          <b-icon v-if="isGilded" pack="fa" icon="star" class="gold-color" size="is-small" style="margin-left: 2px; margin-bottom: 3px;"></b-icon>
+          <span v-if="gildCount > 0" style="margin-left: 2px;">
+            <b-icon pack="fa" icon="star" class="gold-color" size="is-small" style="margin-bottom: 3px;">
+            </b-icon><span v-if="gildCount > 1" class="gold-color">{{ gildCount }}</span>
+          </span>
+          <b-icon v-if="isMod" pack="fa" icon="shield" class="green-color" size="is-small" style="margin-left: 2px; margin-bottom: 3px;"></b-icon>
           <b-icon v-if="isSticky" pack="fa" icon="thumb-tack" class="fa-rotate-270 red-color" size="is-small" style="margin-left: 2px; margin-bottom: 3px;"></b-icon>
           <strong v-if="isOP" style="color: #3498db; text-transform: uppercase; margin-left: 2px">op</strong>
         </div>
@@ -74,7 +78,8 @@ export default {
       isScoreHidden: this.comment.score_hidden || this.comment.score === 0,
       date: common.formatDate(this.comment.created_utc),
       isOP: this.comment.is_submitter,
-      isGilded: this.comment.gilded > 0,
+      isMod: this.comment.distinguished === 'moderator',
+      gildCount: this.comment.gilded,
       isSticky: this.comment.stickied,
       replies: _.get(this.comment, 'replies.data.children', [])
         .filter(({ kind }) => kind !== 'more')
