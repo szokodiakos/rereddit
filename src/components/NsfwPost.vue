@@ -2,7 +2,7 @@
   <div class="center-text">
     <img src="static/waitasec.jpg" style="width: 170px;"><br/>
     <span style="font-size: 25px;">This post is marked as <span class="red-color">Not Safe For Work</span>.</span><br/>
-    <a style="margin-top: 25px;" @click="showPost()" class="button red-color red-border is-outlined red-background-hover">Show me anyway!</a><br/>
+    <a style="margin-top: 25px;" @click="showPost()" class="button red-color transparent-background red-border is-outlined red-background-hover">Show me anyway!</a><br/>
     or<br/>
     Turn on all NSFW posts in the <a @click="openSettings()">Settings</a>.
   </div>
@@ -38,5 +38,9 @@ export default {
 .red-background-hover:hover {
   background-color: #e74c3c;
   color: white !important;
+}
+
+.transparent-background {
+  background-color: transparent;
 }
 </style>
