@@ -25,6 +25,7 @@
 
 <script>
 import RotateLoader from 'vue-spinner/src/RotateLoader';
+import axios from 'axios';
 import _ from 'lodash';
 import { mapMutations, mapState, mapGetters } from 'vuex';
 import InfiniteLoading from 'vue-infinite-loading';
@@ -78,8 +79,8 @@ export default {
     },
     async populateColorBySubreddit(subreddit) {
       if (!this.colors[subreddit]) {
-        const response = await this.$http.get(`https://www.reddit.com/${subreddit}/about.json`);
-        const color = _.get(response, 'body.data.key_color') || common.DEFAULT_COLOR;
+        const response = await axios.get(`https://www.reddit.com/${subreddit}/about.json`);
+        const color = _.get(response, 'data.data.key_color') || common.DEFAULT_COLOR;
         const textColor = common.getTextColor(color);
         this.colors[subreddit] = { color, textColor };
       }
@@ -97,8 +98,8 @@ export default {
       if (after) {
         requestUrl += `&after=t3_${after}`;
       }
-      const response = await this.$http.get(requestUrl);
-      const posts = response.body.data.children.map(({ data: post }) => post);
+      const response = await axios.get(requestUrl);
+      const posts = response.data.data.children.map(({ data: post }) => post);
       const subreddits = _.uniq(posts.map(post => post.subreddit_name_prefixed));
 
       // prefetch subreddits

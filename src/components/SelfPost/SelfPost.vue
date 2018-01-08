@@ -10,12 +10,13 @@
 <script>
 import VueMarkdown from 'vue-markdown';
 import _ from 'lodash';
+import axios from 'axios';
 import he from 'he';
 import Post from '@/components/Post';
 
 async function getDetails(url) {
-  const response = await this.$http.get(`${url.slice(0, -1)}.json`);
-  const details = he.decode(_.get(response, 'body.[0].data.children[0].data.selftext', ''));
+  const response = await axios.get(`${url.slice(0, -1)}.json`);
+  const details = he.decode(_.get(response, 'data.[0].data.children[0].data.selftext', ''));
   return details;
 }
 

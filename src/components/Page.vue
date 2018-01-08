@@ -32,6 +32,7 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import axios from 'axios';
 import RotateLoader from 'vue-spinner/src/RotateLoader';
 import jump from 'jump.js';
 import JumpToTop from '@/components/JumpToTop';
@@ -59,8 +60,8 @@ export default {
     async getSubredditData() {
       let subredditData;
       if (this.subreddit) {
-        const subredditResponse = await this.$http.get(`https://www.reddit.com/${this.subreddit}/about.json`);
-        const subredditDataRaw = subredditResponse.body.data;
+        const subredditResponse = await axios.get(`https://www.reddit.com/${this.subreddit}/about.json`);
+        const subredditDataRaw = subredditResponse.data.data;
         subredditData = {
           title: subredditDataRaw.title,
           onlineUsers: common.formatNumber(subredditDataRaw.accounts_active),

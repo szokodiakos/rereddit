@@ -22,6 +22,7 @@
 
 <script>
 import _ from 'lodash';
+import axios from 'axios';
 import { mapGetters } from 'vuex';
 import Page from '@/components/Page';
 import Comment from '@/components/Comment';
@@ -41,13 +42,13 @@ export default {
   async created() {
     window.scrollTo(0, 0);
     const permalink = this.$route.path;
-    const response = await this.$http.get(`https://www.reddit.com${permalink}.json`);
-    const subredditResponse = await this.$http.get(`https://www.reddit.com/${this.subreddit}/about.json`);
-    const color = _.get(subredditResponse, 'body.data.key_color') || common.DEFAULT_COLOR;
+    const response = await axios.get(`https://www.reddit.com${permalink}.json`);
+    const subredditResponse = await axios.get(`https://www.reddit.com/${this.subreddit}/about.json`);
+    const color = _.get(subredditResponse, 'data.data.key_color') || common.DEFAULT_COLOR;
     const textColor = common.getTextColor(color);
 
-    const post = _.get(response, 'body[0].data.children[0].data', {});
-    this.comments = _.get(response, 'body[1].data.children', [])
+    const post = _.get(response, 'data[0].data.children[0].data', {});
+    this.comments = _.get(response, 'data[1].data.children', [])
       .filter(({ kind }) => kind !== 'more')
       .map(({ data: comment }) => comment);
 

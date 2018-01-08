@@ -50,6 +50,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import _ from 'lodash';
+import axios from 'axios';
 import Typed from 'typed.js';
 import common from '@/common';
 
@@ -68,9 +69,9 @@ export default {
     ...mapGetters(['isDarkModeOn']),
   },
   async mounted() {
-    const response = await this.$http.get('https://www.reddit.com/reddits/.json');
+    const response = await axios.get('https://www.reddit.com/reddits/.json');
     this.subreddits = _
-      .get(response, 'body.data.children', [])
+      .get(response, 'data.data.children', [])
       .map(rawSubreddit => rawSubreddit.data.display_name);
     this.$nextTick(() => {
       this.startTyped();
@@ -159,9 +160,9 @@ export default {
         return;
       }
 
-      const response = await this.$http.get(`https://www.reddit.com/subreddits/search.json?q=${search}&limit=5`);
+      const response = await axios.get(`https://www.reddit.com/subreddits/search.json?q=${search}&limit=5`);
 
-      const results = _.get(response, 'body.data.children', [])
+      const results = _.get(response, 'data.data.children', [])
         .map(({ data }) => ({
           name: data.display_name,
           subscribers: data.subscribers,

@@ -69,6 +69,7 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import axios from 'axios';
 import _ from 'lodash';
 import VueMarkdown from 'vue-markdown';
 import RotateLoader from 'vue-spinner/src/RotateLoader';
@@ -116,8 +117,8 @@ export default {
     async loadTopComments(permalink) {
       if (_.isEmpty(this.comments)) {
         this.areCommentsLoading = true;
-        const response = await this.$http.get(`https://www.reddit.com${permalink}.json`);
-        const comments = _.get(response, 'body[1].data.children', []);
+        const response = await axios.get(`https://www.reddit.com${permalink}.json`);
+        const comments = _.get(response, 'data[1].data.children', []);
         this.comments = comments
           .map(({ data: comment }) => comment)
           .filter(isCommentValid)
