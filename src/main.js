@@ -10,7 +10,7 @@ import 'cool-checkboxes-for-bulma.io/dist/css/bulma-radio-checkbox.min.css';
 import 'scroll-restoration-polyfill';
 import router from './router';
 import App from './App';
-import store from './store';
+import createStore from './store';
 
 history.scrollRestoration = 'manual';
 
@@ -48,7 +48,7 @@ Vue.use(VueAnalytics, {
 new Vue({
   el: '#app',
   router,
-  store,
+  store: createStore(),
   template: '<App/>',
   components: { App },
 });
